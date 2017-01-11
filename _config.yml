@@ -1,8 +1,7 @@
 defaults:
   -
     scope:
-      path: ""
-      type: "posts"
+      path: "_posts"
     values:
       layout: "default"
       disqus: true
