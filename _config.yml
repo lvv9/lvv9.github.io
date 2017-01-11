@@ -1,8 +1,2 @@
-defaults:
-  -
-    scope:
-      path: ""
-    values:
-      title: "thelwq's homepage"
-
+title: "thelwq's homepage"
 theme: jekyll-theme-tactile
