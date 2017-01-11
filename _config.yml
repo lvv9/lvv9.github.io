@@ -4,3 +4,5 @@ defaults:
       path: ""
     values:
       title: "thelwq's homepage"
+
+theme: jekyll-theme-slate
