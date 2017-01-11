@@ -1,6 +1,3 @@
----
-titile: Hello, world!
----
 # Hello, world!
 
 许久之前就想过迁移，加上因tumblr被墙等，最近才把这件事加入了todo。趁着放假的时间，十分保守的我在刚注册的github上搭了起来。
