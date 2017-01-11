@@ -1,6 +1,5 @@
 ---
 title: thelwq's homepage
-type: homepage
 ---
 # thelwq's homepage
 
