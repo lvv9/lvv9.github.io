@@ -4,5 +4,3 @@ defaults:
       path: ""
     values:
       title: "thelwq's homepage"
-
-theme: slate
