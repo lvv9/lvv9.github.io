@@ -1,5 +1,4 @@
 {{ content }}
-{% if site.disqus %}
 <div id="disqus_thread"></div>
 <script>
     /**
@@ -22,4 +21,3 @@
     })();
 </script>
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
-{% endif %}
