@@ -1,6 +1,3 @@
----
-title: thelwq's homepage
----
 # thelwq's homepage
 
 visit my:
