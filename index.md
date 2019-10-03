@@ -1,6 +1,6 @@
 visit my:
 
-- [tumblr](http://tumblr.liuweiqiang.me/)
+- [tumblr](https://thelwq.tumblr.com/)
 - [douban](https://www.douban.com/people/liriban/)
 
 my posts:
