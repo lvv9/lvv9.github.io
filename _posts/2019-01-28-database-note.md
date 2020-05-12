@@ -12,4 +12,5 @@
 ## JDBC
 * JDBC属于动态SQL，Java嵌入式SQL叫SQLJ。
 * 不管动态SQL（包括可滚动的、不可滚动的结果集）、嵌入式SQL，查询语句都有一个类似“游标”的概念，并且在交互过程中必须与数据库保持连接（不可滚动的结果集只有一个移动方向）。
-* 关于结果集的refreshRow和fetchSize：<https://stackoverflow.com/questions/2091659/behaviour-of-resultset-type-scroll-sensitive>
+* 结果集比较复杂，见Oracle的Database JDBC Developer's Guide and Reference之Result Set。
+因为一个Statement默认是Auto-Commit的，只有SELECT FOR UPDATE会在自动提交后保持写锁，其它不加锁的情况可能都会遇到并发问题。
