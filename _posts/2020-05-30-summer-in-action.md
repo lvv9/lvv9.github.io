@@ -42,3 +42,14 @@
 ## 多Bean装配歧义
 - 首选@Primary、\<ean\> primary属性，可以与@Component、@Bean、\<Bean\>一起使用，仅能设置一个
 - @Qualifier限定，在Bean发现时与@Bean、@Component一起使用创建自定义@Qualifier限定符，在Bean装配时与@Autowired限定要装配的Bean
+- 一个Bean只能有一个@Qualifier，可以使用多个自定义限定符注解代替多个自定义@Qualifier限定符
+
+## Bean作用域
+- @Scope、\<bean\> scope属性，value指定是单例还是其它
+- 当注入到单例的Bean时，需要关注proxyMode、\<aop:scope-proxy\>
+
+## 运行时指注入
+略
+
+## AOP
+略
