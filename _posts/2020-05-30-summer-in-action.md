@@ -1,4 +1,7 @@
 # Spring实战
+
+边看（复习）边实验的一些笔记，用的Spring 4：
+
 ## Spring配置
 - Java配置@Configuration
 - XML配置（可以使用Spring Tool Suite）
@@ -30,3 +33,12 @@
 
 ## Profile激活
 - 分为设定值和默认值，都没有时仅创建没有定义在Profile中的Bean
+
+## 条件化Bean发现
+- @Conditional，与@Bean、@Component一起使用（或许只能用在Java配置上，XML配置表达能力较弱但可以通过其它方式实现？）
+- 需要指定实现了Condition接口的xxx.class
+- 在Spring 4中，Profile是用Conditional实现的
+
+## 多Bean装配歧义
+- 首选@Primary、\<ean\> primary属性，可以与@Component、@Bean、\<Bean\>一起使用，仅能设置一个
+- @Qualifier限定，在Bean发现时与@Bean、@Component一起使用创建自定义@Qualifier限定符，在Bean装配时与@Autowired限定要装配的Bean
