@@ -6,7 +6,7 @@
 - javascript
 - node.js
 - vue.js
-- vue-cli、webppack
+- vue-cli、webpack
 - vue-router
 
 ## spring
