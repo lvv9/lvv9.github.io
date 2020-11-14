@@ -16,4 +16,6 @@
 因为一个Statement默认是Auto-Commit的，只有SELECT FOR UPDATE会保持写锁，其它不加锁的情况（Auto-Commit）可能都会遇到并发问题。
 所以并发的情况下需要把Auto-Commit关闭，用其他方式管理事务。
 
+## 隔离级别与并发协议
+
 ## Spring事务管理
