@@ -16,6 +16,36 @@
 因为一个Statement默认是Auto-Commit的，只有SELECT FOR UPDATE会保持写锁，其它不加锁的情况（Auto-Commit）可能都会遇到并发问题。
 所以并发的情况下需要把Auto-Commit关闭，用其他方式管理事务。
 
+## SQL
+- 集合运算：union、intersect、except，保留重复在后面加all
+- 集合比较：some、all
+- 相关子查询：
+```
+select course_id
+from section as S
+where semester = 'Fall' and year = 2009 and
+exists (select *
+from section as T
+where semester = 'Spring' and year = 2010 and
+S.course_id = T.course_id);
+```
+- from子查询：
+```
+select name, salary, avg_salary
+from instructor I1, lateral (select avg(salary) as avg_salary
+from instructor I2
+where I2.dept_name = I1.dept_name);
+```
+- 标量子查询，下面的语句可以检索出客户的订单数量，子查询语句会对第一个查询检索出的每个客户执行一次：
+```
+select cust_name, (select count(*)
+from Orders
+where Orders.cust_id = Customers.cust_id)
+as orders_num
+from Customers
+order by cust_name;
+```
+
 ## 隔离级别与并发协议
 
 ## Spring事务管理
