@@ -80,6 +80,7 @@ new Thread(() -> System.out.println("hello world")).start();
                           poolNumber.getAndIncrement() +
                          "-thread-";
         }
+
         public Thread newThread(Runnable r) {
             Thread t = new Thread(group, r,
                                   namePrefix + threadNumber.getAndIncrement(),
@@ -92,7 +93,7 @@ new Thread(() -> System.out.println("hello world")).start();
         }
     }
 ```
-可以看到这个默认实现是调参数最多的这个构造器构造线程实例，线程组与主线程相同，名字为pool-...
+可以看到这个默认实现是调参数最多的这个构造器构造线程实例，线程组与主线程相同，名字为pool-...  
 回到线程池，线程池创建后submit()提交任务，最终会落到execute(Runnable command)方法内，execute方法：
 ```
     public void execute(Runnable command) {
