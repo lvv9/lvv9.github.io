@@ -362,6 +362,6 @@ new Thread(() -> System.out.println("hello world")).start();
         }
     }
 ```
-挺多内容的，待会回来看。addWorker后，调worker关联线程的start开始任务。  
+挺多内容的，待会回来看，再回到addWorker()，增加worker后，调worker关联线程的start()开始任务。  
 Worker的这个设计，应该是种模式，ThreadLocal中也有。  
 我们知道，在开始的简单的创建启动线程的例子中，Runnable作为Thread构造器的参数，在Thread构造时将其与Runnable绑定起来。但是在线程池的需求中，Runnable任务是随着我们的需求添加的，而Thread线程需要稳定在core这么多个，因而这里通过Thread与Worker绑定、Worker的run()解藕实际的任务Runnable并进行dispatch实现。
