@@ -197,7 +197,7 @@ new Thread(() -> System.out.println("hello world")).start();
      */
     private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
 ```
-注释说得比较清楚了。线程池的shutdown()方法用来使RUNNING状态转到SHUTDOWN状态，而shutdownNow()是把它抓到STOP状态，但这里的STOP，也只是调用线程的interrupt():
+注释说得比较清楚了。线程池的shutdown()方法用来使RUNNING状态转到SHUTDOWN状态，而shutdownNow()是把它转到STOP状态，但这里的STOP，也只是调用线程的interrupt():
 ```
     public List<Runnable> shutdownNow() {
         List<Runnable> tasks;
