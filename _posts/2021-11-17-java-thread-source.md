@@ -362,6 +362,113 @@ new Thread(() -> System.out.println("hello world")).start();
         }
     }
 ```
-挺多内容的，待会回来看，再回到addWorker()，增加worker后，调worker关联线程的start()开始任务。  
+挺多内容的，待会回来看，再回到addWorker()，增加worker后，调worker关联线程的start()开始任务。
+```
+                if (workerAdded) {
+                    t.start();
+                    workerStarted = true;
+                }
+```
 Worker的这个设计，应该是种模式，ThreadLocal中也有。  
-我们知道，在开始的简单的创建启动线程的例子中，Runnable作为Thread构造器的参数，在Thread构造时将其与Runnable绑定起来。但是在线程池的需求中，Runnable任务是随着我们的需求添加的，而Thread线程需要稳定在core这么多个，因而这里通过Thread与Worker绑定、Worker的run()解藕实际的任务Runnable并进行dispatch实现。
+我们知道，在开始的简单的创建启动线程的例子中，Runnable作为Thread构造器的参数，在Thread构造时将其与Runnable绑定起来。但是在线程池的需求中，Runnable任务是随着我们的需求添加的，而Thread线程需要稳定在core这么多个，因而这里通过Thread与Worker绑定、Worker的run()解藕实际的任务Runnable并进行dispatch实现。  
+在runWorker()中，调用了任务队列中任务的run，并最终调用processWorkerExit()：
+```
+    /**
+     * Performs cleanup and bookkeeping for a dying worker. Called
+     * only from worker threads. Unless completedAbruptly is set,
+     * assumes that workerCount has already been adjusted to account
+     * for exit.  This method removes thread from worker set, and
+     * possibly terminates the pool or replaces the worker if either
+     * it exited due to user task exception or if fewer than
+     * corePoolSize workers are running or queue is non-empty but
+     * there are no workers.
+     *
+     * @param w the worker
+     * @param completedAbruptly if the worker died due to user exception
+     */
+    private void processWorkerExit(Worker w, boolean completedAbruptly) {
+        if (completedAbruptly) // If abrupt, then workerCount wasn't adjusted
+            decrementWorkerCount();
+
+        final ReentrantLock mainLock = this.mainLock;
+        mainLock.lock();
+        try {
+            completedTaskCount += w.completedTasks;
+            workers.remove(w);
+        } finally {
+            mainLock.unlock();
+        }
+
+        tryTerminate();
+
+        int c = ctl.get();
+        if (runStateLessThan(c, STOP)) {
+            if (!completedAbruptly) {
+                int min = allowCoreThreadTimeOut ? 0 : corePoolSize;
+                if (min == 0 && ! workQueue.isEmpty())
+                    min = 1;
+                if (workerCountOf(c) >= min)
+                    return; // replacement not needed
+            }
+            addWorker(null, false);
+        }
+    }
+```
+在线程池处于RUNNING或SHUTDOWN的情况下，并且正常执行任务的条件下（还有小于min的情况），再次调用addWorker()，这次firstTask的参数是null。  
+addWorker再次start线程后，新建的Worker的runWorker()中，因为firstTask是null，getTask（）阻塞获取任务：
+```
+    /**
+     * Performs blocking or timed wait for a task, depending on
+     * current configuration settings, or returns null if this worker
+     * must exit because of any of:
+     * 1. There are more than maximumPoolSize workers (due to
+     *    a call to setMaximumPoolSize).
+     * 2. The pool is stopped.
+     * 3. The pool is shutdown and the queue is empty.
+     * 4. This worker timed out waiting for a task, and timed-out
+     *    workers are subject to termination (that is,
+     *    {@code allowCoreThreadTimeOut || workerCount > corePoolSize})
+     *    both before and after the timed wait, and if the queue is
+     *    non-empty, this worker is not the last thread in the pool.
+     *
+     * @return task, or null if the worker must exit, in which case
+     *         workerCount is decremented
+     */
+    private Runnable getTask() {
+        boolean timedOut = false; // Did the last poll() time out?
+
+        for (;;) {
+            int c = ctl.get();
+            int rs = runStateOf(c);
+
+            // Check if queue empty only if necessary.
+            if (rs >= SHUTDOWN && (rs >= STOP || workQueue.isEmpty())) {
+                decrementWorkerCount();
+                return null;
+            }
+
+            int wc = workerCountOf(c);
+
+            // Are workers subject to culling?
+            boolean timed = allowCoreThreadTimeOut || wc > corePoolSize;
+
+            if ((wc > maximumPoolSize || (timed && timedOut))
+                && (wc > 1 || workQueue.isEmpty())) {
+                if (compareAndDecrementWorkerCount(c))
+                    return null;
+                continue;
+            }
+
+            try {
+                Runnable r = timed ?
+                    workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :
+                    workQueue.take();
+                if (r != null)
+                    return r;
+                timedOut = true;
+            } catch (InterruptedException retry) {
+                timedOut = false;
+            }
+        }
+    }
+```
