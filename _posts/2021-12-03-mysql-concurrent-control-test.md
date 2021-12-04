@@ -35,9 +35,7 @@ T2
 mysql> commit;
 Query OK, 0 rows affected (0.00 sec)
 ```
-这个例子，是在记录存在的情况下才成立的，在记录不存在的时候，情况类似：
-
-我们知道，理想的锁并发控制（阻止幻象），应该只对where后面的谓词加锁。但是，MVCC的MySQL实现上基于性能上的考虑，扩大了锁的范围，使用gap lock来阻止非持有锁事务插入记录，从而阻止幻象。
+以上是记录存在的情况，在记录不存在的时候，情况类似：
 ```
 T1
 mysql> update test_for_update set name = 'lwq2' where idtest_for_update = '2';
@@ -48,6 +46,7 @@ T2
 mysql> insert into test_for_update values ('3', 'lwq');
 【阻塞直到T1结束】
 Query OK, 1 row affected (12.67 sec)
+我们知道，理想的锁并发控制（阻止幻象），应该只对where后面的谓词加锁。但是，MVCC的MySQL实现上基于性能上的考虑，扩大了锁的范围，使用gap lock来阻止非持有锁事务插入记录，从而阻止幻象。
 ```
 T1执行select for update加锁同update。
 
