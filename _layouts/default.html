@@ -47,5 +47,19 @@
         ga('send', 'pageview');
       </script>
     {% endif %}
+    
+    <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+    <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+    <script>
+      const gitment = new Gitment({
+  owner: 'lvv9',
+  repo: 'lvv9.github.io',
+  oauth: {
+    client_id: '47ce26561506894940a3',
+    client_secret: '2e3dceb5e87ca8b7efb32411f3b6480f0f564c81',
+})
+
+gitment.render('comments')
+    </script>
   </body>
 </html>
