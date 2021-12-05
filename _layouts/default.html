@@ -27,6 +27,7 @@
       </nav>
       <section>
         {{ content }}
+      </section>
         <div id="comments"></div>
         <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
         <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
@@ -42,7 +43,6 @@
             
             gitment.render('comments')
         </script>
-      </section>
       
       <footer>
         {% if site.github.is_project_page %}
