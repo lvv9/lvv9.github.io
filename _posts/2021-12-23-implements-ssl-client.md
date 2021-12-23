@@ -12,7 +12,7 @@ JSSE参考指南包含API框架和相应的实现，但是底层实现部分相�
 ## 原理
 ![SSL/TLS握手](https://github.com/lvv9/lvv9.github.io/blob/master/pic/image_2021-12-24_00-19-09.png?raw=true)</br>
 从上图可以看到，TLS协议第一个安全方面的验证，就是证书的验证
+![证书验证原理](https://github.com/lvv9/lvv9.github.io/blob/master/pic/image_2021-12-24_01-18-29.png?raw=true)
 > The server sends the client a certificate or a certificate chain. A certificate chain typically begins with the server's public key certificate and ends with the certificate authority's root certificate.
-
 
 就是说，证书的验证，是按证书链来验证的，如果服务端只安装单证书，会发生：
