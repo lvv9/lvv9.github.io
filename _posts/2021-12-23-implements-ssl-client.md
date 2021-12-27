@@ -14,10 +14,11 @@ PEM格式的文件可以使用openssl来转成各种格式，而且我们同样�
 简单地配置了Spring Boot Web（https），证书按需要安装单证书（相当于自签证书）或fullchain证书。
 
 ## 原理及验证
-![证书验证原理](https://github.com/lvv9/lvv9.github.io/blob/master/pic/image_2021-12-24_01-18-29.png?raw=true)
 
-TLS协议第一个安全方面的验证，就是证书的验证
 ![SSL/TLS握手](https://github.com/lvv9/lvv9.github.io/blob/master/pic/image_2021-12-24_00-19-09.png?raw=true)
+在上图的TLS握手中可以看到，协议第一个安全方面的验证，就是证书的验证，具体算法可见 [数字签名算法](https://zh.wikipedia.org/wiki/%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D%E7%AE%97%E6%B3%95) [DSA](https://en.wikipedia.org/wiki/Digital_signature) <br>
+基于安全上等方面上的考虑，签发证书，是从CA分级签发的
+![信任链](https://github.com/lvv9/lvv9.github.io/blob/master/pic/image_2021-12-28_01-41-22.png?raw=true)
 > The server sends the client a certificate or a certificate chain. A certificate chain typically begins with the server's public key certificate and ends with the certificate authority's root certificate.
 
 就是说，证书的验证，是按证书链来验证的，如果服务端只安装单证书，一个默认的客户端实现会发生：
@@ -40,3 +41,4 @@ TLS协议第一个安全方面的验证，就是证书的验证
         socket.startHandshake();
     }
 ```
+通常，证书上的原文，包括证书所有者的域名等信息外，还会包括其生成的公钥。这个公钥，与签发机构签名用的私钥，并不是同一密钥对。
