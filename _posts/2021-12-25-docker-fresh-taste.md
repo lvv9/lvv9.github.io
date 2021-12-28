@@ -11,6 +11,9 @@ container 运行的容器
 > docker image list [OPTIONS] [REPOSITORY[:TAG]]<br>
 
 查看下载的image
+> docker search [OPTIONS] TERM
+
+搜索Docker Hub上的image
 > docker image rm [OPTIONS] IMAGE [IMAGE...]
 
 删除image
