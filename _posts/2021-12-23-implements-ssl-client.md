@@ -41,4 +41,10 @@ PEM格式的文件可以使用openssl来转成各种格式，而且我们同样�
         socket.startHandshake();
     }
 ```
-通常，证书上的原文，包括证书所有者的域名等信息外，还会包括其生成的公钥。这个公钥，与签发机构签名用的私钥，并不是同一密钥对。
+通常，证书上的原文，包括证书所有者的域名等信息外，还会包括其生成的公钥。这个公钥，与签发机构签名用的私钥，并不是同一密钥对。<br>
+从上图也可以看到，自签的证书，证书中的公钥与签发机构的私钥是密钥对。而非自签的证书中，公钥与证书签名对应的私钥不是密钥对。<br>
+理论上，需要认证的证书公钥，可以由被认证方生成并发送到签发机构进行签名。而在这里使用的OHTTPS，是OHTTPS系统帮忙生成并下发的（包括私钥）。
+
+证书中的公钥，除了被用来验证下级证书的合法性外，还可以在通信过程中来加密对称密钥，实现密钥交换（RSA算法）。
+> Server key exchange: The server sends the client a server key exchange message if the public key information from the Certificate is not sufficient for key exchange. For example, in cipher suites based on Diffie-Hellman (DH), this message contains the server's DH public key.<br>
+> The client generates information used to create a key to use for symmetric encryption. For RSA, the client then encrypts this key information with the server's public key and sends it to the server. For cipher suites based on DH, this message contains the client's DH public key.
