@@ -20,3 +20,4 @@ SET GLOBAL server_audit_logging = 'ON';
 SET GLOBAL server_audit_events = 'CONNECT,QUERY,TABLE';
 SHOW GLOBAL VARIABLES '%general_log%';
 ```
+最后，推荐一下DBeaver客户端，苹果用户直接下载DMG即可。
