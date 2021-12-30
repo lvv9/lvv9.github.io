@@ -7,11 +7,11 @@ JSSE参考指南包含API框架和相应的实现，但是底层实现部分相�
 ## 证书准备
 证书是大家耳熟能详的Let's Encrypt签发的，我们可以用 [OHTTPS](https://ohttps.com/) 提供的服务来帮我们管理证书。<br>
 使用邮箱注册，并将某个次级域名解析记录添加后，就可以生成证书（PEM类型）。<br>
-生成的文件包括：私钥文件、证书文件、fullchain证书（包含证书和中间证书）。<br>
+生成的文件包括：私钥文件、证书文件、fullchain证书（包含本级证书、中间证书和根证书）。<br>
 PEM格式的文件可以使用openssl来转成各种格式，而且我们同样可以用openssl来生成自签证书。
 
 ## 服务端
-简单地配置了Spring Boot Web（https），证书按需要安装单证书（相当于自签证书）或fullchain证书。
+简单地配置了Spring Boot Web（https），证书按需要安装。
 
 ## 原理及验证
 
@@ -24,10 +24,14 @@ PEM格式的文件可以使用openssl来转成各种格式，而且我们同样�
 就是说，证书的验证，是按证书链来验证的，如果服务端只安装单证书，一个默认的客户端实现会发生：
 > javax.net.ssl.SSLHandshakeException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
 
-如果客户端同样安装自签证书，就可以验证通过：
+通常，证书上的原文，包括证书所有者的域名等信息外，还会包括其生成的公钥。这个公钥，与签发机构签名用的私钥，并不是同一密钥对。<br>
+从上图也可以看到，自签的证书，证书中的公钥与签发机构的私钥才是密钥对。而非自签的证书中，公钥与证书签名对应的私钥不是密钥对。<br>
+理论上，需要认证的证书公钥，可以由被认证方生成并发送到签发机构进行签名。而在这里使用的OHTTPS，是OHTTPS系统帮忙生成并下发的（包括私钥）。
+
+如果客户端信任单证书，可以验证通过：
 ```
     @Test
-    public void testSelfSignedHandShake() throws Exception {
+    public void testEndCertHandShake() throws Exception {
         KeyStore keyStore = KeyStore.getInstance(type);
         FileInputStream fileInputStream = new FileInputStream(ResourceUtils.getFile(resource));
 //        InputStream inputStream = getClass().getResourceAsStream(path);
@@ -41,10 +45,26 @@ PEM格式的文件可以使用openssl来转成各种格式，而且我们同样�
         socket.startHandshake();
     }
 ```
-通常，证书上的原文，包括证书所有者的域名等信息外，还会包括其生成的公钥。这个公钥，与签发机构签名用的私钥，并不是同一密钥对。<br>
-从上图也可以看到，自签的证书，证书中的公钥与签发机构的私钥是密钥对。而非自签的证书中，公钥与证书签名对应的私钥不是密钥对。<br>
-理论上，需要认证的证书公钥，可以由被认证方生成并发送到签发机构进行签名。而在这里使用的OHTTPS，是OHTTPS系统帮忙生成并下发的（包括私钥）。
+根证书在各种应用场景默认会被安装，在证书链中，删除根证书再安装不会影响证书的验证。
 
-证书中的公钥，除了被用来验证下级证书的合法性外，还可以在通信过程中来加密对称密钥，实现密钥交换（RSA算法）。
+如果客户端直接信任中间证书，服务端只加载安装本级证书，握手过程中也可以验证通过：
+```
+    @Test
+    public void testSelfSignedHandShake() throws Exception {
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        FileInputStream fileInputStream = new FileInputStream(ResourceUtils.getFile(intermediate));
+        keyStore.load(null);
+        keyStore.setCertificateEntry("intermediate", new X509CertImpl(fileInputStream));
+        TrustManagerFactory trustManagerFactory =
+                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustManagerFactory.init(keyStore);
+        SSLContext context = SSLContext.getInstance("TLSv1.2");
+        context.init(new KeyManager[]{}, trustManagerFactory.getTrustManagers(), SecureRandom.getInstanceStrong());
+        SSLSocket socket = (SSLSocket) context.getSocketFactory().createSocket("127.0.0.1", 8433);
+        socket.startHandshake();
+    }
+```
+
+还值得一提的是，证书中的公钥，除了被用来验证下级证书的合法性外，还可以在通信过程中来加密对称密钥，实现密钥交换（RSA算法）。
 > Server key exchange: The server sends the client a server key exchange message if the public key information from the Certificate is not sufficient for key exchange. For example, in cipher suites based on Diffie-Hellman (DH), this message contains the server's DH public key.<br>
 > The client generates information used to create a key to use for symmetric encryption. For RSA, the client then encrypts this key information with the server's public key and sends it to the server. For cipher suites based on DH, this message contains the client's DH public key.
