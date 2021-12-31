@@ -7,7 +7,7 @@ JSSE参考指南包含API框架和相应的实现，但是底层实现部分相�
 ## 证书准备
 证书是大家耳熟能详的Let's Encrypt签发的，我们可以用 [OHTTPS](https://ohttps.com/) 提供的服务来帮我们管理证书。<br>
 使用邮箱注册，并将某个次级域名解析记录添加后，就可以生成证书（PEM类型）。<br>
-生成的文件包括：私钥文件、证书文件、fullchain证书（包含本级证书、中间证书和根证书）。<br>
+生成的文件包括：私钥文件、服务器证书、fullchain证书（包含服务器证书、中间证书和根证书）。<br>
 PEM格式的文件可以使用openssl来转成各种格式，而且我们同样可以用openssl来生成自签证书。
 
 ## 服务端
@@ -28,7 +28,7 @@ PEM格式的文件可以使用openssl来转成各种格式，而且我们同样�
 从上图也可以看到，自签的证书，证书中的公钥与签发机构的私钥才是密钥对。而非自签的证书中，公钥与证书签名对应的私钥不是密钥对。<br>
 理论上，需要认证的证书公钥，可以由被认证方生成并发送到签发机构进行签名。而在这里使用的OHTTPS，是OHTTPS系统帮忙生成并下发的（包括私钥）。
 
-如果客户端信任单证书，可以验证通过：
+如果客户端信任签发的服务器证书，可以验证通过：
 ```
     @Test
     public void testEndCertHandShake() throws Exception {
@@ -45,16 +45,17 @@ PEM格式的文件可以使用openssl来转成各种格式，而且我们同样�
         socket.startHandshake();
     }
 ```
-根证书在各种应用场景默认会被安装，在证书链中，删除根证书再安装不会影响证书的验证。
+根证书在各种应用场景默认会被安装，在证书链中，服务端fullchain证书中删除根证书不会影响证书的验证。
 
-如果客户端直接信任中间证书，服务端只加载安装本级证书，握手过程中也可以验证通过：
+如果客户端直接信任中间证书，服务端只加载安装服务器证书，握手过程中也可以验证通过：
 ```
     @Test
     public void testSelfSignedHandShake() throws Exception {
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         FileInputStream fileInputStream = new FileInputStream(ResourceUtils.getFile(intermediate));
         keyStore.load(null);
-        keyStore.setCertificateEntry("intermediate", new X509CertImpl(fileInputStream));
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+        keyStore.setCertificateEntry("intermediate", certificateFactory.generateCertificate(fileInputStream));
         TrustManagerFactory trustManagerFactory =
                 TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         trustManagerFactory.init(keyStore);
