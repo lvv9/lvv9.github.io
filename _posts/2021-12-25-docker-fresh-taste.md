@@ -1,6 +1,6 @@
 # Docker尝鲜
 ## 安装
-略
+桌面用户安装Docker Desktop即可
 ## 对象
 image 程序包<br>
 repository 包仓库<br>
@@ -41,4 +41,7 @@ container 运行的容器
 > docker container stop [OPTIONS] CONTAINER [CONTAINER...]<br>
 > docker container logs [OPTIONS] CONTAINER<br>
 
-如名称
+如名称，启动、停止、查询日志
+## Docker Compose
+Docker Compose基本上就是用docker-compose.yml来帮助我们自动化部署多个容器，文件的内容基本上就是我们run时对应的参数，与Dockerfile很相似。
+> docker-compose up -d
