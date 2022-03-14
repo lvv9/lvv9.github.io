@@ -1,6 +1,6 @@
 # SSL客户端开发验证
 
-之前对密码学有一定程度的研究，这次本着get your hand dirty的原则，打算造一造轮子——一个简单的SSL客户端。项目代码见<br>
+之前对密码学有一定程度的研究，这次本着get your hand dirty的原则，打算造一造轮子——一个简单的SSL客户端。项目代码见 [这里](https://github.com/lvv9/tls) <br>
 SSL/TLS最广泛的应用当然是HTTP，所以一开始拿OkHttp的源码研究了一下。不久后发现，OkHttp是比较上层的，高层逻辑比较多，翻来翻去，翻到这份 [JSSE参考指南](https://docs.oracle.com/javase/7/docs/technotes/guides/security/jsse/JSSERefGuide.html) 。<br>
 JSSE参考指南包含API框架和相应的实现，但是底层实现部分相关的资料比较少，对着几份官方的文档和Wireshark抓的包，整理了一下SSLSocket实验结果。
 
