@@ -69,3 +69,19 @@ PEM格式的文件可以使用openssl来转成各种格式，而且我们同样�
 还值得一提的是，证书中的公钥，除了被用来验证下级证书的合法性外，还可以在通信过程中来加密对称密钥，实现密钥交换（RSA算法）。
 > Server key exchange: The server sends the client a server key exchange message if the public key information from the Certificate is not sufficient for key exchange. For example, in cipher suites based on Diffie-Hellman (DH), this message contains the server's DH public key.<br>
 > The client generates information used to create a key to use for symmetric encryption. For RSA, the client then encrypts this key information with the server's public key and sends it to the server. For cipher suites based on DH, this message contains the client's DH public key.
+
+## nginx反向代理
+```text
+    server {
+        listen  8443 ssl;
+        ssl_certificate  /etc/nginx/fullchain.cer;
+        ssl_certificate_key  /etc/nginx/cert.key;
+
+        location / {
+            proxy_pass  http://hadoop1:9870/;
+        }
+    }
+```
+```shell
+docker run --name https -v /Users/lwq/Desktop/nginx/nginx.conf:/etc/nginx/nginx.conf -p 8443:8443 --network hadoop -d nginx
+```
