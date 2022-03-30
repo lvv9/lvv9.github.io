@@ -249,11 +249,12 @@ baseOffset: 0 lastOffset: 0 count: 1 baseSequence: -1 lastSequence: -1 producerI
 ```text
 num.partitions
 ```
-上面以在创建主题时指定分区数。
+上面已在创建主题时指定分区数。
 ## 消费者组
 不同的消费者组通常需要对消息做不同的处理。比如，A组发短信，B组发邮件。<br>
 因此一个消费者组需要订阅一个主题的所有消息。这种多个消费者组的工作模式，叫扇出式（参考DDIA）。<br>
 而一个分区只能被一个消费者组内的一个消费者消费，也就是说消费者组中的消费者数量大于分区数的话，会存在某些消费者不干活。这种模式，叫负载均衡式。<br>
+这样的话，同一分区的消息，会按照分区内的顺序被消费。
 ```text
 offsets.retention.minutes
 offsets.topic.num.partitions
@@ -289,11 +290,55 @@ test_group      quickstart-events 0          2               9               7  
 ```text
 unclean.leader.election.enable
 ```
-是否允许非ISR选举为分区leader，默认为false。
+是否允许非ISR选举为分区leader，默认为false。为方便演示，新建2副本主题
+```shell
+bin/kafka-topics.sh --create --topic two-replica-topic --bootstrap-server localhost:9092 --config unclean.leader.election.enable=true --replication-factor 2
+```
+查看leader
+```text
+root@kafka:~/kafka_2.13-3.1.0# bin/kafka-topics.sh --describe --bootstrap-server localhost:9092,kafkf3:9092 --topic two-replica-topic
+Topic: two-replica-topic	TopicId: nwYIqUb2SBi_kiF14n35pg	PartitionCount: 1	ReplicationFactor: 2	Configs: segment.bytes=1073741824,unclean.leader.election.enable=true
+	Topic: two-replica-topic	Partition: 0	Leader: 2	Replicas: 2,1	Isr: 2,1
+```
+停止1号机
+```text
+root@kafka:~/kafka_2.13-3.1.0# bin/kafka-topics.sh --describe --bootstrap-server localhost:9092,kafkf3:9092 --topic two-replica-topic
+Topic: two-replica-topic	TopicId: nwYIqUb2SBi_kiF14n35pg	PartitionCount: 1	ReplicationFactor: 2	Configs: segment.bytes=1073741824,unclean.leader.election.enable=true
+	Topic: two-replica-topic	Partition: 0	Leader: 2	Replicas: 2,1	Isr: 2
+```
+启动消费者，生产者，生产消费1条消息，停止2号机，启动1号机
+```text
+root@kafka:~/kafka_2.13-3.1.0# bin/kafka-topics.sh --describe --bootstrap-server localhost:9092,kafkf3:9092 --topic two-replica-topic
+Topic: two-replica-topic	TopicId: nwYIqUb2SBi_kiF14n35pg	PartitionCount: 1	ReplicationFactor: 2	Configs: segment.bytes=1073741824,unclean.leader.election.enable=true
+	Topic: two-replica-topic	Partition: 0	Leader: 1	Replicas: 2,1	Isr: 1
+```
+停止消费者，发布第2条消息，然后--from-beginning启动消费者，只能消费到第2条消息，再次启动2号机，查看日志
+```text
+root@kafkf3:/# ~/kafka_2.13-3.1.0/bin/kafka-dump-log.sh --print-data-log --files /tmp/kafka-logs/two-repli
+ca-topic-0/00000000000000000000.log 
+Dumping /tmp/kafka-logs/two-replica-topic-0/00000000000000000000.log
+Starting offset: 0
+baseOffset: 0 lastOffset: 0 count: 1 baseSequence: -1 lastSequence: -1 producerId: -1 producerEpoch: -1 partitionLeaderEpoch: 3 isTransactional: false isControl: false position: 0 CreateTime: 1648388037650 size: 69 magic: 2 compresscodec: none crc: 1785415631 isvalid: true
+| offset: 0 CreateTime: 1648388037650 keySize: -1 valueSize: 1 sequence: -1 headerKeys: [] payload: b
+```
 ```text
 broker.rack
 ```
-配置机架、机房，与分区、副本分配算法有关。
-## 
+配置机架/机房，与分区、副本分配算法有关。
+## ~~purgatory~~
 ~~*.purgatory.purge.interval.requests~~
-## 事务
+## API
+可以见 [demo项目](https://github.com/lvv9/kafka-demo)
+## 消息顺序
+如果生产者是集群，一般都不会要求按某种顺序生产消息。如果生产者是单机，或者要求同一机器的消息必须是顺序的，那么
+1. 生产者生产的消息都需要发送到同一分区
+2. 由于生产者API是异步的，需要在broker ack后也就是异步转同步解除阻塞后才发送下一消息
+
+另外有几个producer配置与顺序有关
+```text
+retries
+enable.idempotence
+max.in.flight.requests.per.connection
+```
+按照官方文档的说明，似乎异步调用正常时消息也会按照send()调用的前后排序，以上配置是为了在异步异常时保证顺序，但最保险的还是在应用层有明确的offset返回值时才发送下一消息。<br>
+在获取offset后，可以以offset作为消息的顺序。实现消费者严格按照顺序消费也面临同样的问题，值得进一步深入。不过一般情况下对顺序的要求不是很高。
