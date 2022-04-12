@@ -250,6 +250,15 @@ baseOffset: 0 lastOffset: 0 count: 1 baseSequence: -1 lastSequence: -1 producerI
 num.partitions
 ```
 上面已在创建主题时指定分区数。
+```text
+auto.leader.rebalance.enable
+leader.imbalance.check.interval.seconds
+leader.imbalance.per.broker.percentage
+```
+分区最主要的目的是平衡负载，但在运行过程中可能因为扩展性、故障等而增加、减少分区。<br>
+比较常见的做法是像Redis这样，一开始就创建远超实际节点数的分区，且分区数固定，然后为每个节点动态地分配分区。访问路由表就是分区到节点的映射。<br>
+Kafka分区比较灵活，分区数可以由用户在创建主题时指定，并且可以在运行过程中增加分区数量（不影响旧的消息），并且根据以上3个配置项进行再平衡。<br>
+再平衡与路由可能涉及共识问题，富有挑战性，这里不再深入。
 ## 消费者组
 不同的消费者组通常需要对消息做不同的处理。比如，A组发短信，B组发邮件。<br>
 因此一个消费者组需要订阅一个主题的所有消息。这种多个消费者组的工作模式，叫扇出式（参考DDIA）。<br>
@@ -328,7 +337,8 @@ broker.rack
 ## ~~purgatory~~
 ~~*.purgatory.purge.interval.requests~~
 ## API
-可以见 [demo项目](https://github.com/lvv9/kafka-demo)
+可以见 [demo项目](https://github.com/lvv9/kafka-demo) <br>
+从这里也可以看出，producer API是异步的，如果在消息在被发送前producer挂掉，数据就会丢失。
 ## 消息顺序
 如果生产者是集群，一般都不会要求按某种顺序生产消息。如果生产者是单机，或者要求同一机器的消息必须是顺序的，那么
 1. 生产者生产的消息都需要发送到同一分区
