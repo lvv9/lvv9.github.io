@@ -1,13 +1,13 @@
 # Spring实战
 
-边看（复习）边实验的一些笔记，用的Spring 4：
+一些笔记，用的Spring 4：
 
 ## Spring配置
 - Java配置@Configuration
 - XML配置（可以使用Spring Tool Suite）
 
 ## Bean声明
-- @Component声明
+- @Component注解类声明（类似的包括@Repository、@Service、@Controller）
 - Bean声明，包括Java配置的@Bean和XML配置的\<bean\>
 
 ## Bean发现
@@ -15,7 +15,7 @@
 - @Bean或\<bean\>声明时发现
 
 ## Bean装配
-- 自动装配@Autowired，会自动装配扫描或者声明时发现的Bean
+- 自动装配@Autowired，会自动装配扫描或者声明时发现的Bean（类似的包括@Resource）
 - Bean声明时作为参数自动装配，会自动装配扫描或者声明时发现的Bean
 
 ## XML配置
@@ -48,8 +48,16 @@
 - @Scope、\<bean\> scope属性，value指定是单例还是其它
 - 当注入到单例的Bean时，需要关注proxyMode、\<aop:scope-proxy\>
 
-## 运行时值注入
-略
+## IoC
+控制反转，即对象的管理（Aka 控制），由对象控制（在对象的代码中硬编码）变为由框架、IoC容器根据一定的策略（单例等）控制（Aka 反转了）。
+
+## Bean生命周期
+按顺序用的比较多的有Constructor、setter、afterPropertiesSet()、init-method。
 
 ## AOP
-略
+- 面向切面编程，Spring AOP基于动态代理运行时增强，有JDK Proxy（接口）、CGLib（类）。
+- 另外有AspectJ基于字节码操作。
+- @Transactional是一种切面。
+
+## MVC
+前后端分离，Spring (Rest)Controller成为后端（非框架部分）的入口，View基本由前端实现，Controller返回业务数据Model。
