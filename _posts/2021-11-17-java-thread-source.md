@@ -1,11 +1,11 @@
 # Java线程源码学习
 
 首先这是一个最简单的创建并运行线程的方式：
-```
+```text
 new Thread(() -> System.out.println("hello world")).start();
 ```
 点进构造方法，其内部通过init()执行初始化：
-```
+```text
     public Thread(Runnable target) {
         init(null, target, "Thread-" + nextThreadNum(), 0);
     }
@@ -28,13 +28,13 @@ new Thread(() -> System.out.println("hello world")).start();
                       boolean inheritThreadLocals) {}
 ```
 即线程组为null、任务为构造参数、名称为Thread-n，同样有以下构造器：
-```
+```text
     public Thread(ThreadGroup group, Runnable target, String name,
                   long stackSize) {
 ```
 
 一般实践中，较少这样简单粗暴地创建线程，而是使用线程池来管理：
-```
+```text
     /**
      * Creates a new {@code ThreadPoolExecutor} with the given initial
      * parameters.
@@ -71,7 +71,7 @@ new Thread(() -> System.out.println("hello world")).start();
                               RejectedExecutionHandler handler) {}
 ```
 其中，有个线程工厂参数，线程工厂有方法newThread，JDK有个默认实现类DefaultThreadFactory：
-```
+```text
         DefaultThreadFactory() {
             SecurityManager s = System.getSecurityManager();
             group = (s != null) ? s.getThreadGroup() :
@@ -95,7 +95,7 @@ new Thread(() -> System.out.println("hello world")).start();
 ```
 可以看到这个默认实现是调参数最多的这个构造器构造线程实例，线程组与主线程相同，名字为pool-...  
 回到线程池，线程池创建后submit()提交任务，最终会落到execute(Runnable command)方法内，execute方法：
-```
+```text
     public void execute(Runnable command) {
         if (command == null)
             throw new NullPointerException();
@@ -137,7 +137,7 @@ new Thread(() -> System.out.println("hello world")).start();
     }
 ```
 一开始有点懵，ctl是啥：
-```
+```text
     /**
      * The main pool control state, ctl, is an atomic integer packing
      * two conceptual fields
@@ -198,7 +198,7 @@ new Thread(() -> System.out.println("hello world")).start();
     private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
 ```
 注释说得比较清楚了。线程池的shutdown()方法用来使RUNNING状态转到SHUTDOWN状态，而shutdownNow()是把它转到STOP状态，但这里的STOP，也只是调用线程的interrupt():
-```
+```text
     public List<Runnable> shutdownNow() {
         List<Runnable> tasks;
         final ReentrantLock mainLock = this.mainLock;
@@ -235,7 +235,7 @@ new Thread(() -> System.out.println("hello world")).start();
         }
 ```
 回到execute()，看addWorker()：
-```
+```text
     private boolean addWorker(Runnable firstTask, boolean core) {
         retry:
         for (;;) {
@@ -304,7 +304,7 @@ new Thread(() -> System.out.println("hello world")).start();
     }
 ```
 前半段比较好理解，后半段Worker：
-```
+```text
     private final class Worker
         extends AbstractQueuedSynchronizer
         implements Runnable
@@ -363,7 +363,7 @@ new Thread(() -> System.out.println("hello world")).start();
     }
 ```
 挺多内容的，待会回来看，再回到addWorker()，增加worker后，调worker关联线程的start()开始任务：
-```
+```text
                 if (workerAdded) {
                     t.start();
                     workerStarted = true;
@@ -373,7 +373,7 @@ Worker的这个设计，应该是种模式，ThreadLocal中也有。
 我们知道，在开始的简单的创建启动线程的例子中，Runnable作为Thread构造器的参数，在Thread构造时将其与Runnable绑定起来。  
 但是在线程池的需求中，Runnable任务是随着我们的需求添加的，而Thread线程需要稳定在core这么多个，因而这里通过Thread与Worker绑定、Worker的run()解藕实际的任务Runnable并进行dispatch实现。  
 在runWorker()中，调用了任务队列中任务的run，并最终调用processWorkerExit()：
-```
+```text
     /**
      * Performs cleanup and bookkeeping for a dying worker. Called
      * only from worker threads. Unless completedAbruptly is set,
@@ -417,7 +417,7 @@ Worker的这个设计，应该是种模式，ThreadLocal中也有。
 ```
 在线程池处于RUNNING或SHUTDOWN的情况，并且正常执行任务的条件下（还有小于min的情况），再次调用addWorker()，这次firstTask的参数是null。  
 addWorker再次start线程后，新建的Worker的runWorker()中，因为firstTask是null，getTask（）阻塞获取任务：
-```
+```text
     /**
      * Performs blocking or timed wait for a task, depending on
      * current configuration settings, or returns null if this worker
@@ -472,4 +472,26 @@ addWorker再次start线程后，新建的Worker的runWorker()中，因为firstTa
             }
         }
     }
+```
+## Java Thread
+Java线程底层通过Posix线程实现，Thread的start方法调用native start0，start0通过pthread_create方法启动线程。
+start_routine相当于是Runnable。
+```text
+int pthread_create(pthread_t *restrict thread,
+                   const pthread_attr_t *restrict attr,
+                   void *(*start_routine)(void *),
+                   void *restrict arg);
+```
+Java Thread有同步的join方法，含义和pthread_join差不太多，但Java是通过wait方法来实现的。
+
+还有个getId，对比pthread_self，同样是Java自己的实现。
+
+pthread_detach，Java无相应的操作，默认是joinable的，即线程可以被虚拟机其它线程收回和杀死。
+
+## 信号量
+信号量用来防止不同线程的多条指令以错误的顺序执行。信号量为1的二元信号量又被称为互斥锁。
+```text
+初始化，给与它一个非负数的整数值。
+执行P（wait()），信号标S的值将被减少。企图进入临界区段的进程，需要先执行P（wait()）。当信号标S减为负值时，进程会被挡住，不能继续；当信号标S不为负值时，进程可以获准进入临界区段。
+执行V（signal()），信号标S的值会被增加。结束离开临界区段的进程，将会执行V（signal()）。当信号标S不为负值时，先前被挡住的其他进程，将可获准进入临界区段。
 ```
