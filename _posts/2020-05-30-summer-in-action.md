@@ -149,3 +149,5 @@
 ```
 在请求被handle前后，会触发HandlerInterceptor的preHandle、postHandle、afterCompletion。
 - 即从调用链的角度看，Interceptor更接近Controller。
+
+以上的拦截器是spring web的拦截器，在spring aop中，还有一种拦截器，它是实现spring bean增强的基础。
