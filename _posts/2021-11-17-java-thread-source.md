@@ -93,7 +93,7 @@ new Thread(() -> System.out.println("hello world")).start();
         }
     }
 ```
-可以看到这个默认实现是调参数最多的这个构造器构造线程实例，线程组与主线程相同，名字为pool-...  
+可以看到这个默认实现是调参数最多的这个构造器构造线程实例，线程组与主线程相同，名字为pool-...<br>
 回到线程池，线程池创建后submit()提交任务，最终会落到execute(Runnable command)方法内，execute方法：
 ```text
     public void execute(Runnable command) {
@@ -369,9 +369,9 @@ new Thread(() -> System.out.println("hello world")).start();
                     workerStarted = true;
                 }
 ```
-Worker的这个设计，应该是种模式，ThreadLocal中也有。  
-我们知道，在开始的简单的创建启动线程的例子中，Runnable作为Thread构造器的参数，在Thread构造时将其与Runnable绑定起来。  
-但是在线程池的需求中，Runnable任务是随着我们的需求添加的，而Thread线程需要稳定在core这么多个，因而这里通过Thread与Worker绑定、Worker的run()解藕实际的任务Runnable并进行dispatch实现。  
+Worker的这个设计，应该是种模式，ThreadLocal中也有。<br>
+我们知道，在开始的简单的创建启动线程的例子中，Runnable作为Thread构造器的参数，在Thread构造时将其与Runnable绑定起来。<br>
+但是在线程池的需求中，Runnable任务是随着我们的需求添加的，而Thread线程需要稳定在core这么多个，因而这里通过Thread与Worker绑定、Worker的run()解藕实际的任务Runnable并进行dispatch实现。<br>
 在runWorker()中，调用了任务队列中任务的run，并最终调用processWorkerExit()：
 ```text
     /**
@@ -415,7 +415,7 @@ Worker的这个设计，应该是种模式，ThreadLocal中也有。
         }
     }
 ```
-在线程池处于RUNNING或SHUTDOWN的情况，并且正常执行任务的条件下（还有小于min的情况），再次调用addWorker()，这次firstTask的参数是null。  
+在线程池处于RUNNING或SHUTDOWN的情况，并且正常执行任务的条件下（还有小于min的情况），再次调用addWorker()，这次firstTask的参数是null。<br>
 addWorker再次start线程后，新建的Worker的runWorker()中，因为firstTask是null，getTask（）阻塞获取任务：
 ```text
     /**

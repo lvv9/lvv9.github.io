@@ -18,7 +18,7 @@
 
 ## XML配置
 - c-命名空间对应\<constructor-arg\>构造器注入，p-命名空间对应\<property\>属性注入
-  
+
 ## 混合配置
 - Java与Java配置混合————@Import
 - XML配置混入Java配置————@ImportResource
