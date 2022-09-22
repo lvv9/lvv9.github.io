@@ -13,8 +13,6 @@
 - JDBC属于动态SQL，Java嵌入式SQL叫SQLJ。
 - 不管动态SQL（包括可滚动的、不可滚动的结果集）、嵌入式SQL，查询语句都有一个类似“游标”的概念，并且在交互过程中必须与数据库保持连接（不可滚动的结果集只有一个移动方向）。
 - 结果集比较复杂，见Oracle的Database JDBC Developer's Guide and Reference之Result Set。
-因为一个Statement默认是Auto-Commit的，只有SELECT FOR UPDATE会保持写锁，其它不加锁的情况（Auto-Commit）可能都会遇到并发问题。
-所以并发的情况下需要把Auto-Commit关闭，用其他方式管理事务。
 
 ## SQL
 - 集合运算：union、intersect、except，保留重复在后面加all
@@ -46,9 +44,10 @@ from Customers
 order by cust_name;
 ```
 
-## 隔离级别与并发协议
+<h2 id="isolation">隔离级别与并发协议</h2>
 关于隔离级别，可以从其发展的历史来学习
 1. 1992年ANSI提出了SQL-92，系统定义了四种隔离级别及三种phenomena（脏读、不可重复读、幻读）；
 2. 1995年《A Critique of ANSI SQL Isolation Levels》指出了SQL-92中定义的不足，且不能做到与实现无关，并定义了快照隔离、游标稳定隔离级别和脏写、更新丢失、写倾斜的phenomena；
 3. 1999年《Weak Consistency: A Generalized Theory and Optimistic Implementations for Distributed Transactions》严谨定义了可重复读。
+
 ## Spring事务管理
