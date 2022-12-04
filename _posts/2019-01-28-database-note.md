@@ -44,7 +44,7 @@ from Customers
 order by cust_name;
 ```
 
-<h2 id="isolation">隔离级别与并发协议</h2>
+## 隔离级别与并发协议
 关于隔离级别，可以从其发展的历史来学习
 1. 1992年ANSI提出了SQL-92，系统定义了四种隔离级别及三种phenomena（脏读、不可重复读、幻读）；
 2. 1995年《A Critique of ANSI SQL Isolation Levels》指出了SQL-92中定义的不足，且不能做到与实现无关，并定义了快照隔离、游标稳定隔离级别和脏写、更新丢失、写倾斜的phenomena；
