@@ -11,7 +11,6 @@
 
 ## JDBC
 - JDBC属于动态SQL，Java嵌入式SQL叫SQLJ。
-- 不管动态SQL（包括可滚动的、不可滚动的结果集）、嵌入式SQL，查询语句都有一个类似“游标”的概念，并且在交互过程中必须与数据库保持连接（不可滚动的结果集只有一个移动方向）。
 - 结果集比较复杂，见Oracle的Database JDBC Developer's Guide and Reference之Result Set。
 
 ## SQL
@@ -49,5 +48,3 @@ order by cust_name;
 1. 1992年ANSI提出了SQL-92，系统定义了四种隔离级别及三种phenomena（脏读、不可重复读、幻读）；
 2. 1995年《A Critique of ANSI SQL Isolation Levels》指出了SQL-92中定义的不足，且不能做到与实现无关，并定义了快照隔离、游标稳定隔离级别和脏写、更新丢失、写倾斜的phenomena；
 3. 1999年《Weak Consistency: A Generalized Theory and Optimistic Implementations for Distributed Transactions》严谨定义了可重复读。
-
-## Spring事务管理
