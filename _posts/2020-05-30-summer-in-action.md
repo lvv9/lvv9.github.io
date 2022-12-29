@@ -58,7 +58,7 @@
 - @Transactional是一种切面。
 
 ## MVC
-前后端分离，Spring (Rest)Controller成为后端（非框架部分）的入口，View基本由前端实现，Controller返回业务数据Model。
+前后端分离，Spring Rest Controller成为后端的入口，View基本由前端实现，Controller返回业务数据Model。
 
 ## Filter vs. Interceptor
 - Filter是javax.servlet的，HandlerInterceptor是org.springframework.web.servlet的

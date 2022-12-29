@@ -1,4 +1,5 @@
 # 分布式及ZooKeeper
+
 ## 《Designing Data-Intensive Application》读后
 现在的服务端应用开发，越来越倾向于将服务端应用拆分成多个不同的微服务，同一服务也会以集群的方式部署。
 这种应用组织形式，具有以下优势：
@@ -23,6 +24,7 @@
 
 看起来好像只有一个数据副本，一个比较直观同时支持容错的做法就是，让某一个副本成为主副本，所有操作都按照主副本的顺序进行。
 主副本故障则其它某一个副本代替，而主副本的选取，则通过共识算法选出。
+
 ## ZooKeeper小测
 ZooKeeper便是这样做的，在满足大多数节点正常的条件下，系统可以正常提供服务：<br>
 docker配置2台zookeeper的集群
@@ -126,6 +128,7 @@ Error contacting service. It is probably not running.
 ```
 从以上案例可以看出，zookeeper集群大多数节点正常时才提供服务。
 以及，每台机器运行所需要的集群的信息，是偏静态的，即配置在ZOO_SERVERS中的集群信息。
+
 ## 分布式锁
 首先，什么是分布式锁？究竟这意味着锁服务是分布式的？还是锁服务是管理分布式系统的锁请求？
 在初步找了几个实现方法后，这里取后者描述情况，即分布式锁服务可以是单点的。
@@ -135,15 +138,18 @@ Error contacting service. It is probably not running.
 在锁存在租期的情况下，因为锁请求方的时钟不会与锁管理服务同步，锁请求方会遭遇进程暂停、网络延迟，会导致超时已被释放的锁破坏了资源。
 因此，在这种情况下，需要注意使用fencing token，保证资源本身能提供机制进行保护，可见《DDIA》第八章。
 token可以是随机的，这样资源自身的保护在CAS比较时需使用request token == resource token判断；token也可以是递增的，条件则可以放宽到request token >= resource token。
+
 ### 数据库行锁
 既然可以是单点的，尝试比较简单可靠的实现，锁管理器与资源都由同一实体管理——数据库行锁。
 之前参与过的一些项目，见（ [MySQL并发实验](https://liuweiqiang.me/2021/12/03/mysql-concurrent-control-test.html) )，就是利用数据库业务对象的行锁（select for update），来控制并发的。
 当然，这种锁依赖了业务对象，可以用另外的表（列可包含命名空间+业务ID）来泛化锁。
 
 这种方法会产生较多的长事务，而且锁管理与资源保护是耦合在一起的，使用场景比较有限。
+
 ### 数据库唯一约束
 另一个比较简单的基于数据库的实现——唯一索引。
 个人实验性的实现，可见（ [唯一索引分布式锁](https://github.com/lvv9/distributed-locking) ）
+
 ### ZooKeeper实现
 利用ZooKeeper，我们可以比较快速地实现有容错能力的分布式锁管理。
 同样的实验性实现，见同一项目（ [ZooKeeper分布式锁](https://github.com/lvv9/distributed-locking) ）

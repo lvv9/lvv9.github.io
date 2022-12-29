@@ -473,6 +473,7 @@ addWorker再次start线程后，新建的Worker的runWorker()中，因为firstTa
         }
     }
 ```
+
 ## Java Thread
 Java线程底层通过Posix线程实现，Thread的start方法调用native start0，start0通过pthread_create方法启动线程。
 start_routine相当于是Runnable。

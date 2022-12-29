@@ -1,13 +1,17 @@
 # 家庭服务器
+
 ## 起因
 为了不再忍受Esxi突然断电导致的，直通硬盘无法加载而无法启动虚拟机等问题，本人决定将HPE Proliant MicroServer Gen8重装Proxmox VE（下称PVE）系统。
+
 ## 参考手册
 官方提供了比较详尽的手册，涉及安装过程、维护操作，必读。
+
 ## 存储
 重建zfs过程中发现硬盘挂掉了一个， 运行
 > sudo zpool scrub [pool]
 
 也无法修复，于是参考了其他人的容灾做法，决定将原本的zfs mirror的故障硬盘换成新的，并使用FreeFileSync同步两盘数据。
+
 ## 重建过程注意事项
 1. PVE硬盘直通：
 > qm set [vmid] -scsi[n] [dev]<br>

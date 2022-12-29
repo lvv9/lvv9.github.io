@@ -1,5 +1,6 @@
 # kafka部署验证
 kafka的配置有很多，这里挑一些比较感兴趣的验证一下，官方说明见 [这里](https://kafka.apache.org/31/documentation.html#brokerconfigs)
+
 ## 初始部署配置
 ```properties
 broker.id=0
@@ -162,6 +163,7 @@ All configs that are configurable at cluster level may also be configured at per
 - Static broker config from server.properties
 - Kafka default, see broker configs
 ```
+
 ## 控制器
 ```text
 controller.*
@@ -170,6 +172,7 @@ node.id
 process.roles
 ```
 略，zookeeper版kafka不太需要。
+
 ## 消息日志
 因为消息基本上是final的，kafka使用日志来存储消息，类似于MySQL的binlog，只不过MySQL除了binlog还有其它的结构。<br>
 3.1.0版的开箱配置有个
@@ -193,6 +196,7 @@ bin/kafka-dump-log.sh --files /tmp/kafka-logs/quickstart-events-0/00000000000000
 ```
 而后log文件被删除，增加了后缀为.deleted的文件，最后也被删除。<br>
 文件夹后缀代表分区，文件名代表第一条消息的编号。
+
 ## 副本
 ```text
 default.replication.factor
@@ -245,6 +249,7 @@ Starting offset: 0
 baseOffset: 0 lastOffset: 0 count: 1 baseSequence: -1 lastSequence: -1 producerId: -1 producerEpoch: -1 partitionLeaderEpoch: 2 isTransactional: false isControl: false position: 0 CreateTime: 1647539123622 size: 76 magic: 2 compresscodec: none crc: 2948014261 isvalid: true
 | offset: 0 CreateTime: 1647539123622 keySize: -1 valueSize: 8 sequence: -1 headerKeys: [] payload: replica3
 ```
+
 ## 分区
 ```text
 num.partitions
@@ -259,6 +264,7 @@ leader.imbalance.per.broker.percentage
 比较常见的做法是像Redis这样，一开始就创建远超实际节点数的分区，且分区数固定，然后为每个节点动态地分配分区。访问路由表就是分区到节点的映射。<br>
 Kafka分区比较灵活，分区数可以由用户在创建主题时指定，并且可以在运行过程中增加分区数量（不影响旧的消息），并且根据以上3个配置项进行再平衡。<br>
 再平衡与路由可能涉及共识问题，富有挑战性，这里不再深入。
+
 ## 消费者组
 不同的消费者组通常需要对消息做不同的处理。比如，A组发短信，B组发邮件。<br>
 因此一个消费者组需要订阅一个主题的所有消息。这种多个消费者组的工作模式，叫扇出式（参考DDIA）。<br>
@@ -295,6 +301,7 @@ test_group      quickstart-events 0          2               9               7  
 ```
 再次运行上面的消费者命令，可以看到之前的消息。<br>
 这里有个小插曲，因为上面设置了min.insync.replicas=2，在使用console-consumer时一直消费不了消息，删除后就可以了。<br>
+
 ## 其它高可用、高可靠配置
 ```text
 unclean.leader.election.enable
@@ -334,11 +341,14 @@ baseOffset: 0 lastOffset: 0 count: 1 baseSequence: -1 lastSequence: -1 producerI
 broker.rack
 ```
 配置机架/机房，与分区、副本分配算法有关。
+
 ## ~~purgatory~~
 ~~*.purgatory.purge.interval.requests~~
+
 ## API
 可以见 [demo项目](https://github.com/lvv9/kafka-demo) <br>
 从这里也可以看出，producer API是异步的，如果在消息在被发送前producer挂掉，数据就会丢失。
+
 ## 消息顺序
 如果生产者是集群，一般都不会要求按某种顺序生产消息（除非业务规则上的约束）。如果生产者是单机，或者要求同一机器的消息必须是顺序的，那么
 1. 生产者生产的消息都需要发送到同一分区
@@ -352,6 +362,7 @@ max.in.flight.requests.per.connection
 ```
 按照官方文档的说明，似乎异步调用正常时消息也会按照send()调用的前后排序，以上配置是为了在异步异常时保证顺序，但最保险的还是在应用层有明确的offset返回值时才发送下一消息。<br>
 在获取offset后，可以以offset作为消息的顺序。实现消费者严格按照顺序消费也面临同样的问题，值得进一步深入。不过一般情况下对顺序的要求不是很高。
+
 ### 事件顺序
 在使用事件驱动这种模式时，有时不同业务事件的产生就已经有一定的顺序。
 这种情况下，可以为每个事件附加一个时间戳，以此来当作递增的版本，消费者依据时间戳来保护资源，此时需要误差在一定的范围内。
