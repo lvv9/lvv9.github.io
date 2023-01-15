@@ -96,6 +96,17 @@ James Lewis和Martin Fowler的《Microservices》还指出微服务应具备的�
 > Although “microservice” has become a popular name for this architectural style, its name does lead to an unfortunate focus on the size of service, and arguments about what constitutes “micro”. In our conversations with microservice practitioners, we see a range of sizes of services. The largest sizes reported follow Amazon's notion of the Two Pizza Team (i.e. the whole team can be fed by two pizzas), meaning no more than a dozen people. On the smaller size scale we've seen setups where a team of half-a-dozen would support half-a-dozen services.
 > This leads to the question of whether there are sufficiently large differences within this size range that the service-per-dozen-people and service-per-person sizes shouldn't be lumped under one microservices label. At the moment we think it's better to group them together, but it's certainly possible that we'll change our mind as we explore this style further.
 
+#### 微服务其它模式
+和通常和微服务一起应用的模式有（ https://azure.microsoft.com/en-us/blog/design-patterns-for-microservices/ ）：
+- Bulkhead 隔离不稳定服务造成的大面积失败
+- 网关 又可以细分
+  - 网关聚合
+  - 网关卸载 实现一些切面，鉴权、安全验证、协议转换、限流、降级、熔断、监控
+  - 网关路由 路由
+- Ambassador及Sidecar 
+- 防腐层 在不共享相同语义的不同子系统之间实施外观或适配器层
+- BFF 创建单独的后端服务，供特定的前端应用程序或接口使用
+
 ### REST
 在比较经典的开发实践中，可能会遇到这样的情况：
 - 动态地展示某一前端控件的需求，例如管理后台在某一记录有效时显示"管理"按钮，展示的如果是无效记录时不显示按钮；
