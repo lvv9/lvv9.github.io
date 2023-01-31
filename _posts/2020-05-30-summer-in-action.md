@@ -54,7 +54,7 @@
 
 ## AOP
 - 面向切面编程，Spring AOP基于动态代理运行时增强，有JDK Proxy（接口）、CGLib（类）。
-- 另外有AspectJ基于字节码操作。
+- 另外有AspectJ实现切面。
 - @Transactional是一种切面。
 
 ## MVC

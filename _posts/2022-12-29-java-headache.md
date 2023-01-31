@@ -37,7 +37,7 @@ ArrayList底层用Object[]实现，内部使用了两个空数组：
             grow(minCapacity);
     }
 ```
-核心的扩容方法grow，是按1.5被扩容的，并保证扩容满足minCapacity：
+核心的扩容方法grow，是按1.5倍扩容的，并保证扩容满足minCapacity：
 ```text
     private void grow(int minCapacity) {
         // overflow-conscious code
@@ -483,6 +483,18 @@ public class Singleton {
 - 非抢占
 - 循环等待
 
+#### 解决死锁
+
+死锁防止，破坏上面四个条件之一：
+- 如使用ThreadLocal或String这样的不可变对象
+- 开始前一次性申请所有资源的锁
+- 略
+- 资源排序，按序申请
+
+死锁避免，运行时避免死锁，如银行家算法
+
+死锁检测和解除
+
 ### 锁优化
 指HotSpot对synchronized的优化。
 由于这些优化是与JVM实现相关的，大部分相关的原理需要查阅JVM的源代码（C++）。
@@ -783,3 +795,194 @@ jvms（Java虚拟机规范）规定了两种类加载器：
 这里的父子指的是委派关系上的父子，而不是继承关系上的父子。
 
 使用双亲委派的一个好处是，保证Java程序的稳定运行，避免类重复加载造成的混乱。
+
+## TCP
+RFC 793
+
+### 分层
+TCP的分法，有四层：
+1. 链路层
+2. 网络层 IP
+3. 传输层 TCP、UDP
+4. 应用层 HTTP、FTP、TELNET
+
+OSI分了七层：
+1. 物理层
+2. 数据链路层
+3. 网络层
+4. 传输层
+5. 会话层
+6. 展示层
+7. 应用层
+
+### 可靠性
+这个说法不一，比起实现可靠，或许捋清楚不可靠的原因更加值得关注，这方面在《自顶向下方法》这本书中描述得比较清楚：
+1. 数据包乱序
+2. 数据包丢失
+3. 数据包错误
+
+### 三次握手与四次挥手
+由于是面向连接的，握手双方必须交换初始的控制信息（ISN等），因此至少需要前两次握手。
+而TCP又是可靠的，对于控制信息包（SYN）也是如此（因而SYN也消耗一个序号），所以ACK是必须的，因而通信双方至少个需要一个ACK。
+由于服务方的SYN与ACK可以通过同一包返回，因此握手是三次。
+
+在特殊情况下，握手可以是四次的，比如双方同时打开。
+
+对于SYN的可靠传输，带来一个异常处理上的好处是，ACK接收方（连接发起方）可以识别出错误的包，当ACK所确认的序号，未记录在ACK接收方时，便是一个错误。
+
+对于挥手，由于需要允许半关闭的情况，挥手的ACK由底层内核的TCP完成，而第二次FIN一般是由应用层根据应用逻辑发起关闭。
+
+### 关闭
+发起关闭的一方，即执行主动关闭，在包处理完成后，进入TIME_WAIT（2MSL）状态，这样在另一方FIN发送失败或者主动关闭方ACK发送失败时能够重发ACK。
+同时，TIME_WAIT使得连接变得松弛，不会有旧的包进入新的连接造成错误。
+
+被动关闭的一方，即执行被动关闭，半关闭时的状态是CLOSE_WAIT。
+
+### HTTP
+状态码：
+- 1XX 信息性状态码
+- 2XX 成功
+- 3XX 重定向
+- 4XX 客户端错误
+- 5XX 服务端错误
+
+## 微服务栈
+
+### 限流
+由于通常的分布式锁并无fencing token这样的保护，这样的分布式锁只能用来降低对资源的竞争而不能避免。
+
+比较成熟的方案是通过限流或消息队列来缓解。
+
+#### 算法
+- 固定窗口计数器
+- 滑动窗口计数器 较固定窗口平滑
+- 漏桶 桶满了就限流
+- 令牌桶 桶空了就限流，几乎与漏桶一致
+
+### MySQL
+
+#### 架构
+![架构](https://github.com/lvv9/lvv9.github.io/blob/master/pic/mysql-architecture.png?raw=true)
+
+#### 优化
+一般来说优化也会涉及到应用程序。
+比较成熟的公司、团队会采购成熟的商业软件来进行分析优化，"民间"也有：
+
+|方案|优势|劣势
+|:---:|:---:|:---:
+|System.currentTimeMillis()|简单|代码侵入且繁琐
+|StopWatch|简单且更加方便|代码侵入且繁琐
+|AOP|较少侵入|私有和静态方法无法拦截
+|Java Agent|无侵入|技术难度较高
+
+##### 慢查询日志
+对于MySQL的分析，其中一种是通过自带的慢查询日志（slow_query_log）来查看记录的慢查询。
+
+##### Explain
+查看执行计划。
+
+##### 数据库优化
+包括但不限于
+- 根据需要创建索引，利用排好序的冗余信息来获得更好的查询速度
+- 避免索引实效，如避免左模糊、对谓词所含的列使用函数
+- 增加冗余，反范式
+- 减少数据量，如覆盖索引、只select必要的列、分页等
+- 减少网络IO，如在程序循环外一次性读取而不是循环中读取、batchInsert代替循环insert
+- 使用预编译SQL而不是动态SQL
+- 分库分表，微服务中更多的是垂直分库，水平分叫sharding，shard后涉及到分流（路由）、再平衡、事务的问题
+- 读写分离，使用主从复制分离读请求和写请求，也存在一些现实问题见DDIA
+
+### Redis
+
+#### 数据类型
+- STRING 字符串，RedisObject封装，底层类型之一的SDS更安全、长度函数复杂度低、支持二进制、控制复杂度低
+- LIST 列表，类似于Java的List
+- SET 集合，类似于Java的Set
+- HASH 哈希，类似于Java的HashMap
+- ZSET 有序集合
+
+此外还有BitMap等。
+
+#### RedisObject（数据类型底层实现）
+```text
+Redis objects can be encoded in different ways:
+
+Strings can be encoded as:
+
+raw, normal string encoding.
+int, strings representing integers in a 64-bit signed interval, encoded in this way to save space.
+embstr, an embedded string, which is an object where the internal simple dynamic string, sds, is an unmodifiable string allocated in the same chuck as the object itself. embstr can be strings with lengths up to the hardcoded limit of OBJ_ENCODING_EMBSTR_SIZE_LIMIT or 44 bytes.
+
+Lists can be encoded as ziplist or linkedlist. The ziplist is the special representation that is used to save space for small lists.
+
+Sets can be encoded as intset or hashtable. The intset is a special encoding used for small sets composed solely of integers.
+
+Hashes can be encoded as ziplist or hashtable. The ziplist is a special encoding used for small hashes.
+
+Sorted Sets can be encoded as ziplist or skiplist format. As for the List type small sorted sets can be specially encoded using ziplist, while the skiplist encoding is the one that works with sorted sets of any size.
+
+All the specially encoded types are automatically converted to the general type once you perform an operation that makes it impossible for Redis to retain the space saving encoding.
+```
+
+#### 持久化
+- RDB（全量）
+  - save命令 阻塞主进程
+  - bgsave 创建子进程后主进程解除阻塞，手动bgsave命令执行或根据配置自动执行
+- AOF（增量） 三种刷盘策略
+  - appendfsync always
+  - appendfsync everysec
+  - appendfsync no
+- 混合
+
+#### 部署
+- 单机 可用性低
+- 主从 从发送PSYNC，主发送RDB及增量，不能自动故障转移
+- 哨兵 并发依旧不高，容量依旧不大，机器利用率低
+- 集群 至少3主3从
+
+#### 集群
+```text
+CLUSTER NODES
+```
+查看集群节点信息
+
+```text
+Every Redis Cluster node requires two open TCP connections: a Redis TCP port used to serve clients, e.g., 6379, and second port known as the cluster bus port. By default, the cluster bus port is set by adding 10000 to the data port (e.g., 16379); however, you can override this in the cluster-port configuration.
+
+Cluster bus is a node-to-node communication channel that uses a binary protocol, which is more suited to exchanging information between nodes due to little bandwidth and processing time. Nodes use the cluster bus for failure detection, configuration updates, failover authorization, and so forth. Clients should never try to communicate with the cluster bus port, but rather use the Redis command port. However, make sure you open both ports in your firewall, otherwise Redis cluster nodes won't be able to communicate.
+```
+
+由于分了三个主节点，每个主节点负责一部分数据，因此同样涉及分流（路由）、再平衡、事务的问题。
+
+既然用了Redis，关系型数据库的事务特性几乎无法使用了。
+
+Redis再平衡的做法是：
+固定分16384个分区，如果集群中添加了一个新节点，该新节点可以从每个现有的节点上匀走几个分区。如果从集群中删除节点，则采取相反的均衡措施。
+选中的整个分区会在节点之间迁移，但分区的总数量仍维持不变，也不会改变关键字到分区的映射关系（CRC16后对16383取模）。这里唯一要调整的是分区与节点的对应关系。
+考虑到节点间通过网络传输数据总是需要些时间，这样调整可以逐步完成，在此期间，旧的分区仍然可以接收读写请求。
+
+Redis服务端只支持有限的路由服务：
+- MOVED重定向 客户端在遇到MOVED后应更新映射关系
+- ASK重定向 仅在迁移过程中出现
+
+#### 应用
+点击量计数、排行榜、分布式缓存、分布式锁、集群共享会话等。
+
+#### 淘汰策略
+- noeviction
+- allkeys-lru
+- allkeys-lfu
+- volatile-lru
+- volatile-lfu
+- allkeys-random
+- volatile-random
+- volatile-ttl
+
+#### 一致性
+如果需要非常强的一致性，只能通过共识算法解决。
+
+退而求其次，用小概率不一致的做法：
+- Cache Aside 先更新数据库，后失效缓存。对于缓存实效失败的问题，可以1.不操作自动过期；2.强制失效。
+
+#### lua
+Redis的命令在组合时没有原子性，可以通过lua来完成。
