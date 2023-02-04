@@ -992,6 +992,7 @@ Redis的命令在组合时没有原子性，可以通过lua来完成。
 #### 应用
 - 分布式锁
 - 分布式序列
+- 配置中心
 
 #### 节点类型
 Zookeeper的数据模型是由树形的多个znode节点组成的。节点的类型包括从两个维度组合包括：
@@ -1017,3 +1018,73 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
 - Leader activation 启动、恢复时进入这种状态进行Leader选举，选举后Leader需先将状态同步到Follower。
   选举选出服务器最新事务ID中的epoch任期最大的，epoch有相同的则选出事务ID中的count最大的，接着是机器ID最大的。
   如果Leader在其任内出现任期大于它的事务，且这个Leader任内zxid最大的那部分提议没有被任一参与投票的Follower COMMIT，说明已有新的Leader，那么这部分过期的提议会被放弃。
+
+### 消息队列
+一般应用于：
+- 异步 有助于实现响应式的风格
+- 削峰
+- 解藕 实现观察者模式
+
+#### RocketMQ
+
+##### 部署模型
+- Producer 消息生产者
+- Consumer 消息消费者
+- Broker 消息代理，接收生产者发送的消息，发送给消费者，存在主从
+- NameServer 为生产者和消费者提供服务发现，无状态，
+
+##### 消息模型
+- 主题 与Kafka的Topic类似
+- 队列 对应Kafka的分区，顺序投递时需要实现MessageQueueSelector
+- 消费者组 同Kafka，一个消费者组订阅主题的全部内容，组内消费者均衡分配队列（RocketMQ集群模式，也就是通常意义上的队列模型，不同的消费者组可以当作发布订阅模型）。
+  还有广播模式，组内消费者处理所有队列的消息（一般不用）
+- 标签Tag RocketMQ中用来在业务上归类的标识，使用Tag（二级分类）可以实现对Topic（一级分类）中的消息进行过滤，官方文档说明了【什么时候该用Topic，什么时候该用Tag？】
+- 事务消息 RocketMQ通过生产者检查本地事务状态与"回查"的方式来实现事务消息：
+  ```在断网或者是生产者应用重启的特殊情况下，若服务端未收到发送者提交的二次确认结果，或服务端收到的二次确认结果为Unknown未知状态，经过固定时间后，服务端将对消息生产者即生产者集群中任一生产者实例发起消息回查。```
+  没有实现共识，理论上是不构成原子提交的，但也是业界比较常用的做法了。
+- 生产者组 用在运维与事务消息上：
+  ```此外，需要注意的是事务消息的生产组名称ProducerGroupName不能随意设置。事务消息有回查机制，回查时Broker端如果发现原始生产者已经崩溃，则会联系同一生产者组的其他生产者实例回查本地事务执行情况以Commit或Rollback半事务消息。```
+
+##### 消费模式
+- Push 消费者实现Listener的接口，将消费方法注册
+- Pull
+
+### Dubbo
+
+#### 架构
+- 服务提供者
+- 服务消费者
+- 注册中心
+- 监控中心
+
+#### 负载均衡算法
+- 加权随机
+- 最小活跃数
+- 一致性哈希
+- 加权轮询
+
+#### 序列化
+默认hessian2
+
+### Spring
+
+#### IoC
+控制反转将对象创建的控制反转了，由IoC容器控制对象的创建。
+
+依赖注入（DI）是实现控制反转的一种方式。
+
+#### 注解
+- org.springframework.beans.factory.annotation.Autowired
+- javax.annotation.Resource
+
+#### Spring AOP vs. AspectJ
+- Spring AOP基于代理运行时增强
+- AspectJ基于字节码操作在编译前后或加载前增强
+
+#### Spring Boot Starter自动装配
+Spring的SPI机制，通过扫描ClassLoader中Jar的META-INF/spring.factories元数据【org.springframework.boot.autoconfigure.EnableAutoConfiguration=xxx（@Configuration）】实现。
+
+#### 循环依赖
+主要解决思路是提前暴露对象，因此如果依赖的双方都是通过构造器注入的话就无法解决，跨作用域的注入也无法解决。
+
+使用三级缓存而不是二级缓存是基于最终需要注入的是代理类的考虑。

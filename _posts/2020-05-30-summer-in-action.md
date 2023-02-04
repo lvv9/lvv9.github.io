@@ -1,4 +1,4 @@
-# Spring实战
+# Spring基础
 
 ## Spring配置
 - Java配置@Configuration
@@ -50,7 +50,7 @@
 控制反转，即对象的管理（Aka 控制），由对象控制（在对象的代码中硬编码）变为由框架、IoC容器根据一定的策略（单例等）控制（Aka 反转了）。
 
 ## Bean生命周期
-按顺序用的比较多的有Constructor、setter、afterPropertiesSet()、init-method。
+按顺序用的比较多的有Constructor、setter、*Aware、afterPropertiesSet()、init-method。
 
 ## AOP
 - 面向切面编程，Spring AOP基于动态代理运行时增强，有JDK Proxy（接口）、CGLib（类）。
