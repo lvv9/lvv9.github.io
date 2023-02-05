@@ -23,6 +23,9 @@ ArrayList底层用Object[]实现，内部使用了两个空数组：
         elementData[size++] = e;
         return true;
     }
+    private void ensureCapacityInternal(int minCapacity) {
+        ensureExplicitCapacity(calculateCapacity(elementData, minCapacity));
+    }
     private static int calculateCapacity(Object[] elementData, int minCapacity) {
         if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
             return Math.max(DEFAULT_CAPACITY, minCapacity);
@@ -67,6 +70,9 @@ HashMap底层（第一层）是Node<K,V>[]
 
 HashMap核心的方法：
 ```text
+    public V put(K key, V value) {
+        return putVal(hash(key), key, value, false, true); // 内部的扰动函数使得碰撞的可能性更低，见 https://www.zhihu.com/question/20733617/answer/111577937
+    }
     final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                    boolean evict) {
         Node<K,V>[] tab; Node<K,V> p; int n, i;
@@ -246,6 +252,7 @@ resize初始化及扩容：
     }
 ```
 除去初始化的逻辑，基本就是扩大两倍（newThr = oldThr << 1），然后根据是树节点还是链表节点进行迁移。
+容量设计为2次幂是基于算法效率上的考虑，如使用e.hash & (newCap - 1)计算下标。
 
 ### HashSet
 HashSet实现上基本是对HashMap的包装，value为固定的 private static final Object PRESENT = new Object() 。
@@ -976,7 +983,7 @@ Redis服务端只支持有限的路由服务：
 - volatile-lfu
 - allkeys-random
 - volatile-random
-- volatile-ttl
+- volatile-ttl Removes keys with expire field set to true and the shortest remaining time-to-live (TTL) value.
 
 #### 一致性
 如果需要非常强的一致性，只能通过共识算法解决。
