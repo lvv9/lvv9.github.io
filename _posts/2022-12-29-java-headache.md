@@ -273,7 +273,7 @@ LinkedList使用双向链表实现：
         }
     }
 ```
-同时还实现了这些接口：List、Deque（音同deck，双向队列），其中Deque还声明了栈的相关操作。
+同时还实现了Deque（音同deck，双向队列）接口，其中Deque还声明了栈的相关操作。
 
 ### ArrayDeque
 用数组实现的双向队列，插入后自动扩容。
@@ -431,7 +431,7 @@ Thread state for a thread which has not yet started.
         thread.start();
         TimeUnit.SECONDS.sleep(1);
         synchronized (EventListener.class) {
-            EventListener.class.notifyAll(); // 需要特别注意notify信号可能会错过，因为一个可能的调度是notify时其它线程还尚未wait
+            EventListener.class.notifyAll(); // 需要特别注意notify信号可能会错过，因为一个可能的调度是notify时其它线程还尚未wait（尚未synchronized）
             System.in.read();
         }
     }
@@ -507,7 +507,7 @@ public class Singleton {
 由于这些优化是与JVM实现相关的，大部分相关的原理需要查阅JVM的源代码（C++）。
 
 包括：
-- 锁粗化
+- 锁粗化 避免频繁的锁开销
 - 锁消除
 - 锁升级
 - 自适应自旋锁 在自旋的基础上自适应自旋的次数
@@ -704,7 +704,7 @@ JVM实现可以自由地决定不在规范中描述的细节，如运行时的�
 
 ### 运行时数据区
 即运行时会用到的数据的区域，其中一些区域与虚拟机进程的生命周期绑定，另外一些与线程的绑定。
-- pc寄存器 值可以用三元表达式表达（运行方法是native? undefined: 字节码指令地址），与线程绑定
+- pc寄存器 其值可以用三元表达式表达（运行方法是native? undefined: 字节码指令地址），与线程绑定
 - Java虚拟机栈（线程）
 - Java堆（进程） 需要垃圾回收
 - 方法区（进程） 内含运行时常量池（对象类型的只包含引用，对象数据在堆中），可以不进行垃圾回收<br>
@@ -718,7 +718,7 @@ JVM实现可以自由地决定不在规范中描述的细节，如运行时的�
 #### HotSpot内存参数
 - -Xss Java虚拟机栈大小
 - -Xms、-Xmx Java堆最小最大大小
-- -XX:MaxMetaspaceSize 元空间（方法去的HotSpot实现）大小，默认无上限
+- -XX:MaxMetaspaceSize 元空间（方法区的HotSpot实现）大小，默认无上限
 - -MaxDirectMemorySize 直接内存，不属于运行时数据区，New IO中的DirectByteBuffer对象会用到，直接内存受此参数与本地内存的限制
 
 #### HotSpot对象的创建
@@ -873,7 +873,7 @@ OSI分了七层：
 
 #### 优化
 一般来说优化也会涉及到应用程序。
-比较成熟的公司、团队会采购成熟的商业软件来进行分析优化，"民间"也有：
+比较成熟的公司、团队会采购成熟的商业软件来进行分析，"民间"也有：
 
 |方案|优势|劣势
 |:---:|:---:|:---:
@@ -891,7 +891,7 @@ OSI分了七层：
 ##### 数据库优化
 包括但不限于
 - 根据需要创建索引，利用排好序的冗余信息来获得更好的查询速度
-- 避免索引实效，如避免左模糊、对谓词所含的列使用函数
+- 避免索引失效，如避免左模糊、对谓词所含的列使用函数
 - 增加冗余，反范式
 - 减少数据量，如覆盖索引、只select必要的列、分页等
 - 减少网络IO，如在程序循环外一次性读取而不是循环中读取、batchInsert代替循环insert
@@ -943,7 +943,7 @@ All the specially encoded types are automatically converted to the general type 
 
 #### 部署
 - 单机 可用性低
-- 主从 从发送PSYNC，主发送RDB及增量，不能自动故障转移
+- 主从 从节点发送PSYNC，主节点发送RDB及增量，不能自动故障转移
 - 哨兵 并发依旧不高，容量依旧不大，机器利用率低
 - 集群 至少3主3从
 
@@ -985,11 +985,11 @@ Redis服务端只支持有限的路由服务：
 - volatile-random
 - volatile-ttl Removes keys with expire field set to true and the shortest remaining time-to-live (TTL) value.
 
-#### 一致性
+#### 缓存一致性
 如果需要非常强的一致性，只能通过共识算法解决。
 
 退而求其次，用小概率不一致的做法：
-- Cache Aside 先更新数据库，后失效缓存。对于缓存实效失败的问题，可以1.不操作自动过期；2.强制失效。
+- Cache Aside 先更新数据库，后失效缓存。对于因缓存失效失败的问题，可以1.不操作自动过期；2.提供操作后台强制失效。
 
 #### lua
 Redis的命令在组合时没有原子性，可以通过lua来完成。
@@ -1020,7 +1020,7 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
 
 ##### 工作状态
 - Active messaging 集群工作在这种状态时，Leader按（改进的）两阶段提交的方式进行：
-  1. Leader按事务ID——zxid（epoch, count组成）顺序提议（写请求）
+  1. Leader按事务ID——zxid（epoch+count组成）顺序提议（写请求）
   2. Follower按序回复，过半通过后Leader发送COMMIT
 - Leader activation 启动、恢复时进入这种状态进行Leader选举，选举后Leader需先将状态同步到Follower。
   选举选出服务器最新事务ID中的epoch任期最大的，epoch有相同的则选出事务ID中的count最大的，接着是机器ID最大的。

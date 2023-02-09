@@ -197,7 +197,15 @@ new Thread(() -> System.out.println("hello world")).start();
      */
     private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
 ```
-注释说得比较清楚了。线程池的shutdown()方法用来使RUNNING状态转到SHUTDOWN状态，而shutdownNow()是把它转到STOP状态，但这里的STOP，也只是调用线程的interrupt():
+注释说得比较清楚了。
+
+这里可以大致总结出线程池的工作原理是：
+如果线程数小于core，则启动新的线程运行；
+否则加入任务队列；
+如果加入失败队列满了，则启动非核心线程；
+如果启动失败线程数大于最大线程数，则拒绝。
+
+线程池的shutdown()方法用来使RUNNING状态转到SHUTDOWN状态，而shutdownNow()是把它转到STOP状态，但这里的STOP，也只是调用线程的interrupt():
 ```text
     public List<Runnable> shutdownNow() {
         List<Runnable> tasks;
