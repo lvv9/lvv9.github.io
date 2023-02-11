@@ -718,6 +718,7 @@ JVM实现可以自由地决定不在规范中描述的细节，如运行时的�
 #### HotSpot内存参数
 - -Xss Java虚拟机栈大小
 - -Xms、-Xmx Java堆最小最大大小
+  - -Xmn 新生代大小，即将将-XX:NewSize与-XX:MaxNewSize设为一致
 - -XX:MaxMetaspaceSize 元空间（方法区的HotSpot实现）大小，默认无上限
 - -MaxDirectMemorySize 直接内存，不属于运行时数据区，New IO中的DirectByteBuffer对象会用到，直接内存受此参数与本地内存的限制
 
@@ -803,6 +804,57 @@ jvms（Java虚拟机规范）规定了两种类加载器：
 
 使用双亲委派的一个好处是，保证Java程序的稳定运行，避免类重复加载造成的混乱。
 
+### 问题排查及调优
+需要具体问题具体分析。
+
+#### 应用执行耗时分析
+|方案|优势|劣势
+|:---:|:---:|:---:
+|System.currentTimeMillis()|简单|代码侵入且繁琐
+|StopWatch|简单且更加方便|代码侵入且繁琐
+|AOP|较少侵入|私有和静态方法无法拦截
+|Java Agent、Attach API（Arthas trace）|无侵入|技术难度较高
+
+#### 重放+Debug
+在开发阶段最常用手段，线上一般不允许使用。
+
+如果远程服务支持，可以远程Debug。
+
+#### 日志分析异常
+包括应用日志、中间件日志，测试阶段常用，线上可能会屏蔽低级别日志。
+
+应用问题排查要求对应用日志打印得较全。个人经验是打印方法所有的输入，如入参、DAO的返回等。
+
+有时会漏打，通过JVM的一些API（Java Agent、Attach API）可以实现一些运行时增强，如BTrace、Arthas。
+
+#### jstack查看线程状态
+在遇到应用僵死时常用。
+
+##### CPU高占用
+```shell
+ps -emT | more # 查看进程与线程
+ps -eT Huk -pcpu | more # 按CPU占用排序查看线程
+```
+查看进程与线程CPU占用，jstack <PID> 然后通过16进制的SPID（小写）找到相应的线程分析。
+
+还可以通过专业工具的火焰图分析。
+
+#### JDK内存分析工具
+分析OOM与内存泄漏时常用，见上《运行时数据区》。
+
+#### GC日志
+同样也是分析内存问题时常用，需JVM参数
+- -XX:+PrintGCDetails 或简化版-verbose:gc
+- -XX:+PrintGCTimeStamps
+- -XX:+PrintGCDateStamps
+- -XX:+UseGCLogFileRotation
+- -XX:NumberOfGCLogFiles=1
+- -XX:GCLogFileSize=1M
+- -Xloggc:<file>
+- -XX:+PrintHeapAtGC
+
+获得GC日志后可以通过gceasy.io等分析工具分析。也可结合jstat。
+
 ## TCP
 RFC 793
 
@@ -872,15 +924,6 @@ OSI分了七层：
 ![架构](https://github.com/lvv9/lvv9.github.io/blob/master/pic/mysql-architecture.png?raw=true)
 
 #### 优化
-一般来说优化也会涉及到应用程序。
-比较成熟的公司、团队会采购成熟的商业软件来进行分析，"民间"也有：
-
-|方案|优势|劣势
-|:---:|:---:|:---:
-|System.currentTimeMillis()|简单|代码侵入且繁琐
-|StopWatch|简单且更加方便|代码侵入且繁琐
-|AOP|较少侵入|私有和静态方法无法拦截
-|Java Agent|无侵入|技术难度较高
 
 ##### 慢查询日志
 对于MySQL的分析，其中一种是通过自带的慢查询日志（slow_query_log）来查看记录的慢查询。
