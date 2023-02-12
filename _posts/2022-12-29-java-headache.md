@@ -686,7 +686,6 @@ synchronized是Java语言提供的特性，Java语言只规定了synchronized语
 |公平|非公平|both
 |可重入|支持|支持
 |condition|一个|多个
-|释放|隐式|显式
 
 #### 常见基于AQS的工具
 - ReentrantLock（CyclicBarrier）
@@ -713,7 +712,32 @@ JVM实现可以自由地决定不在规范中描述的细节，如运行时的�
 
 > 运行时数据区是一种概念模型，具体的Java虚拟机并不一定要完全照着概念模型的定义来进行设计，可能会通过一些更高效率的等价方式去实现它。
 
-字符串常量池在哪个区域值得商榷，本人自己测试String.valueOf(i++).intern()同时调节MaxMetaspaceSize是不会有MetaSpace的OOM的（Zulu虚拟机）。
+字符串常量池在哪个区域值得商榷，本人自己测试String.valueOf(i++).intern()同时调节MaxMetaspaceSize是不会有MetaSpace的OOM的（Zulu OpenJDK）。
+
+以下方法也没看出intern时哪个区域的使用大小有变化（jconsole）
+```text
+    public static void main(String[] args) throws Exception {
+        int size = 11116384;
+        Set<String> set = new HashSet<>(size + 1);
+        int count = 0;
+        String zero = String.valueOf(size - 1);
+        set.add(zero);
+        String copy = String.valueOf(size - 1);
+        if (zero != copy.intern() && copy == zero.intern()) {
+            System.out.println("aaa");
+        }
+        for (int i = size; i < 2 * size; i++) {
+            set.add(String.valueOf(i));
+        }
+        for (String s: set) {
+            if (s == s.intern()) {
+                count++;
+            }
+        }
+        System.out.println(set.size());
+        System.out.println(count);
+    }
+```
 
 #### HotSpot内存参数
 - -Xss Java虚拟机栈大小
@@ -734,7 +758,7 @@ JVM实现可以自由地决定不在规范中描述的细节，如运行时的�
 - 或如果是内存泄漏还没溢出，在通过系统工具找到占用大的进程后，使用jmap获取HeapDump文件（jps -l 查看pid）
   > jmap -dump:<dump-options> <pid>
 
-获取HeapDump文件后可通过jhat工具的hist图、rootset等方式分析
+获取HeapDump文件后可通过jhat工具的histo图、rootset等方式分析
 > jhat -port 1099 dump.test
 
 #### 其它内存问题
@@ -1018,6 +1042,12 @@ Redis服务端只支持有限的路由服务：
 #### 应用
 点击量计数、排行榜、分布式缓存、分布式锁、集群共享会话等。
 
+在应用于缓存时，需要考虑以下情况不适用：
+- 频繁修改、写多于读
+- 强一致
+
+对于应用配置、业务参数等更新不频繁而又需要较强的一致性（主要是原子性）时，可以考虑增加版本号，将数据转换为不可变数据，继而使用缓存。
+
 #### 淘汰策略
 - noeviction
 - allkeys-lru
@@ -1034,8 +1064,13 @@ Redis服务端只支持有限的路由服务：
 退而求其次，用小概率不一致的做法：
 - Cache Aside 先更新数据库，后失效缓存。对于因缓存失效失败的问题，可以1.不操作自动过期；2.提供操作后台强制失效。
 
+#### 缓存实效问题
+- 缓存穿透 Cache Penetration 缓存结果而不是缓存数据
+- 缓存击穿 Cache Breakdown
+- 缓存雪崩 Cache Avalanche 随机化过期时间
+
 #### lua
-Redis的命令在组合时没有原子性，可以通过lua来完成。
+Redis的命令执行模型是单线程的，但在应用组合多命令时没有原子性，这时可以通过lua来完成。
 
 ### ZooKeeper
 
