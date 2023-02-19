@@ -145,6 +145,10 @@ text域映射的两个最重要属性是index和analyzer。
 ## 部署
 Docker Hub中有官方提供的镜像。部署模式是单机伪集群。建议用7.X版本，Flink驱动还没有8.X版本的。
 [官方文档](https://www.elastic.co/guide/en/elasticsearch/reference/8.1/docker.html)
+```shell
+docker run -p 127.0.0.1:9200:9200 -p 127.0.0.1:9300:9300 -e "discovery.type=single-node" --name ecstatic_jang --network docker_default docker.elastic.co/elasticsearch/elasticsearch:7.17.9
+docker run --name kib01-test --network docker_default -p 127.0.0.1:5601:5601 -e "ELASTICSEARCH_HOSTS=http://ecstatic_jang:9200" docker.elastic.co/kibana/kibana:7.17.9
+```
 
 ## Flink
 ![架构](https://github.com/lvv9/lvv9.github.io/blob/master/pic/flink-cdc-streaming-etl.png?raw=true)
@@ -157,7 +161,7 @@ Docker Hub中有官方提供的镜像。部署模式是单机伪集群。建议�
 2. 创建用户```CREATE USER 'user'@'localhost' IDENTIFIED BY 'password';```
 3. 授权```GRANT SELECT, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'user'@'localhost';```
 4. ```FLUSH PRIVILEGES;```
-5. ```set global binlog_format='ROW';```
+5. Flink只支持RBL```set global binlog_format='ROW';```
 
 ### 部署Flink
 https://nightlies.apache.org/flink/flink-docs-release-1.16/docs/deployment/resource-providers/standalone/docker/#flink-sql-client-with-session-cluster
@@ -246,7 +250,7 @@ Flink SQL> CREATE TABLE enriched_request (
     PRIMARY KEY (id) NOT ENFORCED
   ) WITH (
     'connector' = 'elasticsearch-7',
-    'hosts' = 'http://docker_es801_1:9200',
+    'hosts' = 'http://ecstatic_jang:9200',
     'index' = 'enriched_request'
   );
 
