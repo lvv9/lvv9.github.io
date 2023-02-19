@@ -143,5 +143,117 @@ text域映射的两个最重要属性是index和analyzer。
 - 允许数据精度损失等其它业务可接受的折衷，然后应用相应的算法
 
 ## 部署
-Docker Hub中有官方提供的镜像。部署模式是单机伪集群。
+Docker Hub中有官方提供的镜像。部署模式是单机伪集群。建议用7.X版本，Flink驱动还没有8.X版本的。
 [官方文档](https://www.elastic.co/guide/en/elasticsearch/reference/8.1/docker.html)
+
+## Flink
+![架构](https://github.com/lvv9/lvv9.github.io/blob/master/pic/flink-cdc-streaming-etl.png?raw=true)
+
+### 准备测试数据
+略
+
+### 准备连接
+1. 下载flink-sql-connector-mysql-cdc、flink-sql-connector-elasticsearch7
+2. 创建用户```CREATE USER 'user'@'localhost' IDENTIFIED BY 'password';```
+3. 授权```GRANT SELECT, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'user'@'localhost';```
+4. ```FLUSH PRIVILEGES;```
+5. ```set global binlog_format='ROW';```
+
+### 部署Flink
+https://nightlies.apache.org/flink/flink-docs-release-1.16/docs/deployment/resource-providers/standalone/docker/#flink-sql-client-with-session-cluster
+```text
+version: "2.2"
+services:
+  jobmanager:
+    image: flink:1.16.0-scala_2.12
+    ports:
+      - "8081:8081"
+    command: jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+
+  taskmanager:
+    image: flink:1.16.0-scala_2.12
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    scale: 1
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 2
+```
+
+### 运行客户端
+```shell
+docker cp flink-sql-connector-*.jar docker_jobmanager_1:/opt/flink/lib/
+docker cp flink-sql-connector-*.jar docker_taskmanager_1:/opt/flink/lib/
+docker exec -it [CONTAINER] /bin/bash
+./bin/sql-client.sh
+```
+
+```text
+Flink SQL> SET execution.checkpointing.interval = 3s;
+
+Flink SQL> CREATE TABLE request (
+    id INT,
+    consumer STRING,
+    request_id STRING,
+    consumer_origin STRING,
+    request_id_origin STRING,
+    status STRING,
+    version INT,
+    PRIMARY KEY (id) NOT ENFORCED
+  ) WITH (
+    'connector' = 'mysql-cdc',
+    'hostname' = 'docker.for.mac.localhost',
+    'port' = '3306',
+    'username' = 'user',
+    'password' = 'password',
+    'database-name' = 'idempotent',
+    'table-name' = 'request',
+    'server-time-zone' = 'Asia/Shanghai'
+  );
+
+Flink SQL> CREATE TABLE consumer (
+    id INT,
+    consumer STRING,
+    description STRING,
+    PRIMARY KEY (id) NOT ENFORCED
+  ) WITH (
+    'connector' = 'mysql-cdc',
+    'hostname' = 'docker.for.mac.localhost',
+    'port' = '3306',
+    'username' = 'user',
+    'password' = 'password',
+    'database-name' = 'idempotent',
+    'table-name' = 'consumer',
+    'server-time-zone' = 'Asia/Shanghai'
+  );
+
+Flink SQL> CREATE TABLE enriched_request (
+    id INT,
+    consumer STRING,
+    description STRING,
+    request_id STRING,
+    consumer_origin STRING,
+    description_origin STRING,
+    request_id_origin STRING,
+    status STRING,
+    PRIMARY KEY (id) NOT ENFORCED
+  ) WITH (
+    'connector' = 'elasticsearch-7',
+    'hosts' = 'http://docker_es801_1:9200',
+    'index' = 'enriched_request'
+  );
+
+Flink SQL> INSERT INTO enriched_request
+ SELECT r.id, r.consumer, c1.description, r.request_id, r.consumer_origin, c2.description,
+ r.request_id_origin, r.status
+ FROM request AS r
+ LEFT JOIN consumer AS c1 ON r.consumer = c1.consumer
+ LEFT JOIN consumer AS c2 ON r.consumer_origin = c2.consumer;
+```
