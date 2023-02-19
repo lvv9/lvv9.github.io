@@ -143,7 +143,7 @@ text域映射的两个最重要属性是index和analyzer。
 - 允许数据精度损失等其它业务可接受的折衷，然后应用相应的算法
 
 ## 部署
-Docker Hub中有官方提供的镜像。部署模式是单机伪集群。建议用7.X版本，Flink驱动还没有8.X版本的。
+Docker Hub中有官方提供的镜像。部署模式是单机。建议用7.X版本，Flink驱动还没有8.X版本的。
 [官方文档](https://www.elastic.co/guide/en/elasticsearch/reference/8.1/docker.html)
 ```shell
 docker run -p 127.0.0.1:9200:9200 -p 127.0.0.1:9300:9300 -e "discovery.type=single-node" --name ecstatic_jang --network docker_default docker.elastic.co/elasticsearch/elasticsearch:7.17.9
