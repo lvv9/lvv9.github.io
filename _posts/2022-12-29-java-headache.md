@@ -1139,17 +1139,39 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
 #### 架构
 - 服务提供者
 - 服务消费者
-- 注册中心
+- 注册中心 有：
+  - ZooKeeper
+  - Nacos
+  - Redis
+  - Multicast
 - 监控中心
+
+服务提供者将自身信息注册到注册中心（ZK的临时节点），客户端运行时到注册中心取服务提供者信息，并缓存本地，因此注册中心挂掉后不影响运行中的客户端。
 
 #### 负载均衡算法
 - 加权随机
-- 最小活跃数
+- 最小活跃数 请求开始活跃数增加，请求结束活跃数减少，高性能节点活跃数下降得快
 - 一致性哈希
 - 加权轮询
 
-#### 序列化
-默认hessian2
+#### 容错
+- Failover 自动切换并重试，成功后返回成功结果
+- Failfast 快速失败，抛出异常
+- Failsafe 失败安全，忽略异常，返回默认结果
+- Failback 失败自动恢复，先返回默认结果，使用另外的线程定时重试
+- Forking 并发调用，返回成功的
+- Broadcast 逐个调用，任意一台报错则报错
+- 其它略
+
+#### RPC协议
+默认的RPC协议为Dubbo，使用netty服务端和hessian2序列化。
+
+#### Dubbo vs. Spring Cloud OpenFeign
+|Dubbo|Feign
+|:---:|:---:
+|RPC风格，耦合较高|RESTful
+|还包括了负载均衡等|需要其它组件配合
+|倾向于自定义协议，更容易获得高性能|HTTP
 
 ### Spring
 
