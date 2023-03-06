@@ -441,6 +441,8 @@ Thread state for a thread which has not yet started.
 Object.wait后获取到锁未被notify、Thread.join、LockSupport.park时进入的状态。
 对于ReentrantLock.lock、ReentrantLock.newCondition.await，由于底层调用的是LockSupport.park，所以线程状态不是BLOCKED而是WAITING或TIMED_WAITING。
 
+Tips：notify是"不可靠的"，被notify的对象可能会错过notify信号。
+
 #### TIMED_WAITING
 同上，不过带时间参数，Thread.sleep时也是。
 
@@ -495,7 +497,7 @@ public class Singleton {
 死锁防止，破坏上面四个条件之一：
 - 如使用ThreadLocal或String这样的不可变对象
 - 开始前一次性申请所有资源的锁
-- 略
+- 无法申请时主动/被动释放资源
 - 资源排序，按序申请
 
 死锁避免，运行时避免死锁，如银行家算法
@@ -916,7 +918,7 @@ OSI分了七层：
 对于挥手，由于需要允许半关闭的情况，挥手的ACK由底层内核的TCP完成，而第二次FIN一般是由应用层根据应用逻辑发起关闭。
 
 ### 关闭
-发起关闭的一方，即执行主动关闭，在包处理完成后，进入TIME_WAIT（2MSL）状态，这样在另一方FIN发送失败或者主动关闭方ACK发送失败时能够重发ACK。
+发起关闭的一方，即执行主动关闭，在包处理完成后，进入TIME_WAIT（2MSL）状态，这样在另一方FIN发送失败或者主动关闭方ACK发送失败时能够重发FIN及ACK。
 同时，TIME_WAIT使得连接变得松弛，不会有旧的包进入新的连接造成错误。
 
 被动关闭的一方，即执行被动关闭，半关闭时的状态是CLOSE_WAIT。
@@ -938,9 +940,9 @@ OSI分了七层：
 
 #### 算法
 - 固定窗口计数器
-- 滑动窗口计数器 较固定窗口平滑
-- 漏桶 桶满了就限流
-- 令牌桶 桶空了就限流，几乎与漏桶一致
+- 滑动窗口计数器 减小突发流量击穿的概率，滑动间隔越短概率越小
+- 漏桶 请求以固定速率被消费，桶满了就限流，可能会无故地增加延迟
+- 令牌桶 桶空了就限流，启动时最好初始化成满的
 
 ### MySQL
 
@@ -1217,7 +1219,7 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
 - AspectJ基于字节码操作在编译前后或加载前增强
 
 #### Spring Boot Starter自动装配
-Spring的SPI机制，通过扫描ClassLoader中Jar的META-INF/spring.factories元数据【org.springframework.boot.autoconfigure.EnableAutoConfiguration=xxx（@Configuration）】实现。
+Spring Boot的SPI机制，通过扫描ClassLoader中Jar的META-INF/spring.factories元数据【org.springframework.boot.autoconfigure.EnableAutoConfiguration=xxx（@Configuration）】实现。
 
 #### 循环依赖
 主要解决思路是提前暴露对象，因此如果依赖的双方都是通过构造器注入的话就无法解决，跨作用域的注入也无法解决。
