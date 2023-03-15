@@ -151,6 +151,7 @@ docker run --name kib01-test --network docker_default -p 127.0.0.1:5601:5601 -e 
 ```
 
 ## Flink
+https://ververica.github.io/flink-cdc-connectors/master/content/%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B/mysql-postgres-tutorial-zh.html
 ![架构](https://github.com/lvv9/lvv9.github.io/blob/master/pic/flink-cdc-streaming-etl.png?raw=true)
 
 ### 准备测试数据
@@ -261,3 +262,26 @@ Flink SQL> INSERT INTO enriched_request
  LEFT JOIN consumer AS c1 ON r.consumer = c1.consumer
  LEFT JOIN consumer AS c2 ON r.consumer_origin = c2.consumer;
 ```
+
+### 流处理理论
+
+#### 名词解释
+- HDFS Hadoop框架的分布式文件系统
+- MapReduce（狭义） Hadoop中执行map和reduce的引擎
+- Hive MapReduce的高层接口（SQL）
+- HBase 运行在HDFS之上的一种NoSQL
+- Spark 另外一种计算引擎，被Hive支持，性能较MapReduce好，同时有自己的SQL API，Spark SQL同时支持操作Hive
+- Flink 更加新颖的一种（流）计算引擎，如上面中的栗子
+
+#### 资料
+在豆瓣上搜最高分的有松鼠书。
+
+松鼠书也有一些没有的内容，如批处理、Table API
+见官方文档 https://nightlies.apache.org/flink/flink-docs-release-1.16/zh
+
+推荐阅读顺序
+1. 执行模式（流/批） https://nightlies.apache.org/flink/flink-docs-release-1.16/zh/docs/dev/datastream/execution_mode/
+2. 动态表 (Dynamic Table) https://nightlies.apache.org/flink/flink-docs-release-1.16/zh/docs/dev/table/concepts/dynamic_tables/
+3. 概念与通用 API https://nightlies.apache.org/flink/flink-docs-release-1.16/zh/docs/dev/table/common/
+4. 时间属性 https://nightlies.apache.org/flink/flink-docs-release-1.16/zh/docs/dev/table/concepts/time_attributes/
+5. DataStream API Integration https://nightlies.apache.org/flink/flink-docs-release-1.16/zh/docs/dev/table/data_stream_api/

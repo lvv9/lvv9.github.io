@@ -839,7 +839,7 @@ jvms（Java虚拟机规范）规定了两种类加载器：
 |System.currentTimeMillis()|简单|代码侵入且繁琐
 |StopWatch|简单且更加方便|代码侵入且繁琐
 |AOP|较少侵入|私有和静态方法无法拦截
-|Java Agent、Attach API（Arthas trace）|无侵入|技术难度较高
+|Java Agent、Attach API（Arthas trace）|无侵入|开发门槛较高，需要注意多Agent之间的执行顺序、冲突
 
 #### 重放+Debug
 在开发阶段最常用手段，线上一般不允许使用。
@@ -1225,3 +1225,13 @@ Spring Boot的SPI机制，通过扫描ClassLoader中Jar的META-INF/spring.factor
 主要解决思路是提前暴露对象，因此如果依赖的双方都是通过构造器注入的话就无法解决，跨作用域的注入也无法解决。
 
 使用三级缓存而不是二级缓存是基于最终需要注入的是代理类的考虑。
+
+### 版本号
+
+#### 语义化版本
+https://semver.org/lang/zh-CN/
+
+版本格式：主版本号.次版本号.修订号，版本号递增规则如下：
+1. 主版本号：当你做了不兼容的 API 修改，
+2. 次版本号：当你做了向下兼容的功能性新增，
+3. 修订号：当你做了向下兼容的问题修正。
