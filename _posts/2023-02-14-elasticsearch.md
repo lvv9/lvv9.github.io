@@ -42,14 +42,6 @@ PUT /blog/_doc/1?version=1实现乐观锁。
 routing默认为_id，可通过请求的routing参数进行自定义。
 
 ### 搜索
-搜索通过GET /_search?size=5&from=5实现，此处查询所有文档的全文。或：
-```text
-POST /_search
-{
-  "from": 30,
-  "size": 10
-}
-```
 
 #### 字段
 在索引时，Elasticsearch首先分析文档，之后根据结果创建倒排索引（inverted index），进而实现搜索。
@@ -59,7 +51,7 @@ POST /_search
 映射（mapping、模式定义），能够将时间域视为时间，数字域视为数字。
 如果域是未预先定义的，那么会被动态映射。
 
-当索引一个文档的时候，Elasticsearch取出所有字段的值拼接成一个大的字符串，作为_all字段进行索引。
+当索引一个文档的时候，Elasticsearch取出所有字段的值拼接成一个大的字符串，作为_all字段进行索引（新版本已移除这种特性）。
 而每个字段的值都被添加到自己的倒排索引中。
 
 text域映射的两个最重要属性是index和analyzer。
@@ -83,24 +75,13 @@ text域映射的两个最重要属性是index和analyzer。
   }
   ```
 
+##### 复杂类型
+简单类型数组与单个值类型相同。
+
 对于object域内部的域，Elasticsearch内部转化成user.name这样来表示。
 
-然后搜索步骤是：
-1. 检查字段类型 分析域（text）意味着查询字符串被应用相同的分析器（分词、标准化等）。
-2. 分析查询字符串 将查询的字符串传入分析器中（可以与索引的分析器不同），而查询一个精确值域时，不会分析查询字符串。
-3. 查找匹配文档 查询在倒排索引中查找结果的每个词，然后获取一组文档。
-4. 为每个文档评分 计算每个文档相关度评分 _score 。
-
-因此，查询可以分为：
-- 过滤 检查包含或者排除，不参与评分
-- 查询 匹配有相关性的文档，参与评分
-
-对于精确值的查询，建议用filter语句来取代query，因为filter将会被缓存。
-
-#### 排序
-默认排序是_score降序，使用sort参数可以改变。 
-
-如果字段有多个值（如数组），需要利用函数将多值字段减为单值。
+multi-fields：
+> It is often useful to index the same field in different ways for different purposes. This is the purpose of multi-fields. For instance, a string field could be mapped as a text field for full-text search, and as a keyword field for sorting or aggregations:
 
 类型为text的、被分析的字段可能需要按不分析来排序，可以映射为
 ```text
@@ -114,7 +95,43 @@ text域映射的两个最重要属性是index和analyzer。
     }
 }
 ```
-并在使用时引用"sort": "tweet.raw"。
+并在搜索时引用"sort": "tweet.raw"。
+
+##### 搜索
+```text
+POST /megacorp/employee/_search
+{
+    "query" : {
+        "bool": {
+            "must": {
+                "match" : {
+                    "last_name" : "smith"
+                }
+            },
+            "filter": {
+                "range" : {
+                    "age" : { "gt" : 30 }
+                }
+            }
+        }
+    }
+}
+```
+1. 检查字段类型 分析域（text）意味着查询字符串被应用相同的分析器（分词、标准化等）。
+2. 分析查询字符串 将查询的字符串传入分析器中（可以与索引的分析器不同），而查询一个精确值域时，不会分析查询字符串。
+3. 查找匹配文档 查询在倒排索引中查找结果的每个词，然后获取一组文档。
+4. 为每个文档评分 计算每个文档相关度评分 _score 。
+
+搜索分为：
+- 过滤 上面的栗子中用filter包裹的部分，不参与评分，可以缓存，通常用在精确值域
+  > such as the filter or must_not parameters in the bool query, the filter parameter in the constant_score query, or the filter aggregation.
+- 查询 匹配有相关性的文档，参与评分，不被缓存
+
+#### 排序
+默认排序是_score降序，使用sort参数可以改变。 
+
+如果字段有多个值（如数组），最好利用函数将多值字段减为单值以便于排序的进行。
+被分析的字符串字段也是多值字段。
 
 #### 分布式检索
 因文档分区是跨机器的，执行检索时必须用到逻辑分页：
