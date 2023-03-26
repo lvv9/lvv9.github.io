@@ -695,6 +695,9 @@ synchronized是Java语言提供的特性，Java语言只规定了synchronized语
 - CountDownLatch
 - ReentrantReadWriteLock
 
+### 线程池
+见 https://liuweiqiang.me/2021/11/17/java-thread-source.html
+
 ## JVM
 JVM与Java语言其实没有太大的关系，但它们都和class字节码有着重要的联系。
 
@@ -965,7 +968,7 @@ OSI分了七层：
 - 消息队列
 - 数据库（包括RDBMS和NoSQL）
 - 注册中心、配置中心
-- 分布式事务
+- 分布式事务 https://liuweiqiang.me/2022/12/28/consistency.html
 - 监控跟踪
 
 ### 分布式锁
@@ -990,6 +993,13 @@ OSI分了七层：
 #### 架构
 ![架构](https://github.com/lvv9/lvv9.github.io/blob/master/pic/mysql-architecture.png?raw=true)
 
+#### 事务
+https://liuweiqiang.me/2019/01/28/database-note.html & https://liuweiqiang.me/2022/12/28/consistency.html
+
+#### 索引
+- B+树索引 https://liuweiqiang.me/2020/09/08/qs&tree.html
+- hash索引
+
 #### 优化
 
 ##### 慢查询日志
@@ -1001,8 +1011,8 @@ OSI分了七层：
 ##### 数据库优化
 包括但不限于
 - 根据需要创建索引，利用排好序的冗余信息来获得更好的查询速度
-- 避免索引失效，如避免左模糊、对谓词所含的列使用函数
-- 增加冗余，反范式
+- 避免索引失效，如避免左模糊、对谓词所含的列使用函数、谓词中的操作无法使用索引
+- 反范式，增加冗余
 - 减少数据量，如覆盖索引、只select必要的列、分页等
 - 减少网络IO，如在程序循环外一次性读取而不是循环中读取、batchInsert代替循环insert
 - 使用预编译SQL而不是动态SQL
