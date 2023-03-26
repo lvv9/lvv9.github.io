@@ -924,14 +924,55 @@ OSI分了七层：
 被动关闭的一方，即执行被动关闭，半关闭时的状态是CLOSE_WAIT。
 
 ### HTTP
+由 请求行（请求）/状态行（响应） + 头部 + 空行 + 消息体 组成
+
 状态码：
-- 1XX 信息性状态码
+- 1XX 信息性状态码，表示继续处理
 - 2XX 成功
 - 3XX 重定向
 - 4XX 客户端错误
 - 5XX 服务端错误
 
+请求方法：
+- GET
+- POST
+- PUT
+- DELETE
+- PATCH
+- HEAD
+- OPTIONS
+- CONNECT
+- TRACE
+
+#### GET vs. POST
+|-|GET|POST
+|:---:|:---:|:---:
+|缓存|可以|一般不支持
+|服务器状态|无变化|有变化
+|请求参数|在URL和HEAD，因而长度的编码有限制|在BODY
+|多次请求|无副作用|有副作用
+|其它浏览器行为|-|-
+
+#### HTTPS
+见 https://liuweiqiang.me/2021/12/23/implements-ssl-client.html
+
 ## 微服务栈
+这里也有一些说明 https://liuweiqiang.me/2022/08/29/ddd-&-hibernate.html
+
+常用的框架及中间件（可以参考Spring Cloud）：
+- 网关
+- RPC/REST
+- 消息队列
+- 数据库（包括RDBMS和NoSQL）
+- 注册中心、配置中心
+- 分布式事务
+- 监控跟踪
+
+### 分布式锁
+如果Redis客户端是Redisson，建议直接用封装好的。
+
+基本思路是通过唯一约束来实现，包括Redis的key、RDBMS的唯一索引。
+加锁时插入，解锁时删除。
 
 ### 限流
 由于通常的分布式锁并无fencing token这样的保护，这样的分布式锁只能用来降低对资源的竞争而不能避免。
@@ -1226,9 +1267,9 @@ Spring Boot的SPI机制，通过扫描ClassLoader中Jar的META-INF/spring.factor
 
 使用三级缓存而不是二级缓存是基于最终需要注入的是代理类的考虑。
 
-### 版本号
+## 版本号
 
-#### 语义化版本
+### 语义化版本
 https://semver.org/lang/zh-CN/
 
 版本格式：主版本号.次版本号.修订号，版本号递增规则如下：
