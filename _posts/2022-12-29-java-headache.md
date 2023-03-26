@@ -1169,14 +1169,14 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
 - Producer 消息生产者
 - Consumer 消息消费者
 - Broker 消息代理，接收生产者发送的消息，发送给消费者，存在主从（还可以多主）：
-  - ASYNC_MASTER
+  - ASYNC_MASTER 异步指与SLAVE的交互
   - SYNC_MASTER 可靠
   - SLAVE
 
   Broker刷盘：
   - SYNC_FLUSH 可靠
   - ASYNC_FLUSH 性能
-- NameServer 为生产者和消费者提供服务发现，无状态，
+- NameServer 为生产者和消费者提供服务发现，无状态
 
 ##### 消息模型
 - 主题 与Kafka的Topic类似
@@ -1192,7 +1192,7 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
 - Pull
 
 ##### 特色消息
-- 顺序消息 顺序消息的代价太高，建议在应用层保证，不要依赖中间件的顺序性保证。
+- 顺序消息 顺序消息的代价太高，建议在应用层保证，不要依赖中间件的顺序性保证。 https://liuweiqiang.me/2022/03/16/kafka-in-action.html
   RocketMQ的顺序保证只能保证同一生产者的顺序性，且需要满足：
   - 生产者顺序投递至同一队列（即同一分区），且需要同步发送，在同步发送成功前不能发送下一消息
   - Broker故障时消息不乱序，这种配置会影响可用性
