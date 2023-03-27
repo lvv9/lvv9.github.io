@@ -448,6 +448,7 @@ Tips：notify是"不可靠的"，被notify的对象可能会错过notify信号�
 
 ### Java内存模型
 和分布式系统一样，在并发处理器下，不同的模型会有不同的一致性级别。
+简单地说，JMM是一种模型，抽象出了Java程序员与JVM实现之间的契约。
 > The Java Memory Model describes what behaviors are legal in multithreaded code, and how threads may interact through memory. It describes the relationship between variables in a program and the low-level details of storing and retrieving them to and from memory or registers in a real computer system. It does this in a way that can be implemented correctly using a wide variety of hardware and a wide variety of compiler optimizations.
 > Java includes several language constructs, including volatile, final, and synchronized, which are intended to help the programmer describe a program's concurrency requirements to the compiler. The Java Memory Model defines the behavior of volatile and synchronized, and, more importantly, ensures that a correctly synchronized Java program runs correctly on all processor architectures.
 
@@ -455,7 +456,8 @@ Tips：notify是"不可靠的"，被notify的对象可能会错过notify信号�
 
 中文版可以参考程晓明的《深入理解Java内存模型》。
 
-从Java应用程序员的角度看的话，最重要的是Happens-before规则。
+从Java应用程序员的角度看的话，最重要的是Happens-before规则：
+If one action happens-before another, then the first is visible to and ordered before the second.
 > It should be noted that the presence of a happens-before relationship between two actions does not necessarily imply that they have to take place in that order in an implementation. If the reordering produces results consistent with a legal execution, it is not illegal.
 
 #### 懒汉单例
@@ -697,6 +699,9 @@ synchronized是Java语言提供的特性，Java语言只规定了synchronized语
 
 ### 线程池
 见 https://liuweiqiang.me/2021/11/17/java-thread-source.html
+
+### ThreadLocal
+见 https://liuweiqiang.me/2020/09/08/qs&tree.html
 
 ## JVM
 JVM与Java语言其实没有太大的关系，但它们都和class字节码有着重要的联系。
@@ -1016,8 +1021,17 @@ https://liuweiqiang.me/2019/01/28/database-note.html & https://liuweiqiang.me/20
 - 减少数据量，如覆盖索引、只select必要的列、分页等
 - 减少网络IO，如在程序循环外一次性读取而不是循环中读取、batchInsert代替循环insert
 - 使用预编译SQL而不是动态SQL
-- 分库分表，微服务中更多的是垂直分库，水平分叫sharding，shard后涉及到分流（路由）、再平衡、事务的问题
 - 读写分离，使用主从复制分离读请求和写请求，也存在一些现实问题见DDIA
+- 分库分表，微服务中更多的是垂直分库，水平分叫sharding，shard后涉及到分流（路由）、再平衡、事务的问题
+
+#### drop vs. truncate vs. delete
+|-|drop|truncate|delete
+|:---:|:---:|:---:|:---:
+|类型|DDL|DDL|DML
+|回滚|不可以|不可以|可以
+|元数据|删除|重置|不变
+|速度|快|较快｜较慢
+|触发器|不触发|不触发|触发
 
 ### Redis
 
@@ -1117,7 +1131,7 @@ Redis服务端只支持有限的路由服务：
 退而求其次，用小概率不一致的做法：
 - Cache Aside 先更新数据库，后失效缓存。对于因缓存失效失败的问题，可以1.不操作自动过期；2.提供操作后台强制失效。
 
-#### 缓存实效问题
+#### 缓存失效问题
 - 缓存穿透 Cache Penetration 缓存null结果而不是缓存数据
 - 缓存击穿 Cache Breakdown 临时降低并发
 - 缓存雪崩 Cache Avalanche 随机化过期时间
