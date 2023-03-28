@@ -771,6 +771,8 @@ JVM实现可以自由地决定不在规范中描述的细节，如运行时的�
 获取HeapDump文件后可通过jhat工具的histo图、rootset等方式分析
 > jhat -port 1099 dump.test
 
+在打开资源时，良好的习惯是使用try-with-resources或finally释放。
+
 #### 其它内存问题
 栈问题一般都比较容易排查。
 
@@ -810,6 +812,9 @@ JVM实现可以自由地决定不在规范中描述的细节，如运行时的�
 - 标记清除 适用于不需要大量清除的情况，如老年代
 - 标记复制 与标记清除相反
 - 标记整理 与清除算法类似，但需要移动对象，移动则内存回收时会更复杂，不移动则内存分配时会更复杂，结果是移动的话吞吐量大、不占CPU时间，不移动时停顿少
+
+#### 引用类型
+这里涉及一些 https://liuweiqiang.me/2020/09/08/qs&tree.html
 
 ### 类加载
 类加载有三个阶段：
@@ -1287,9 +1292,7 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
 Spring Boot的SPI机制，通过扫描ClassLoader中Jar的META-INF/spring.factories元数据【org.springframework.boot.autoconfigure.EnableAutoConfiguration=xxx（@Configuration）】实现。
 
 #### 循环依赖
-主要解决思路是提前暴露对象，因此如果依赖的双方都是通过构造器注入的话就无法解决，跨作用域的注入也无法解决。
-
-使用三级缓存而不是二级缓存是基于最终需要注入的是代理类的考虑。
+主要解决思路是提前暴露对象，因此如果依赖的多方都是通过构造器注入、或者不是单例的情况就无法解决。
 
 ## 版本号
 
