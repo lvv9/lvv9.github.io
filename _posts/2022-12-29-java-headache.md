@@ -816,6 +816,9 @@ JVM实现可以自由地决定不在规范中描述的细节，如运行时的�
 #### 引用类型
 这里涉及一些 https://liuweiqiang.me/2020/09/08/qs&tree.html
 
+#### 垃圾收集器选型
+一般需要综合停顿时间、吞吐量、多处理器利用，一般交易服务器使用ParNew+CMS实现低停顿时间。
+
 ### 类加载
 类加载有三个阶段：
 1. 加载 加载的结果是得到Class<?>，其中数组类是由虚拟机创建的，不存在数组类的外部class字节码
@@ -893,6 +896,8 @@ ps -eT Huk -pcpu | more # 按CPU占用排序查看线程
 - -XX:+PrintHeapAtGC
 
 获得GC日志后可以通过gceasy.io等分析工具分析。也可结合jstat。
+
+新生代频繁GC，可以考虑加大新生代的大小。
 
 ## TCP
 RFC 793
@@ -1265,6 +1270,8 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
 
 #### RPC协议
 默认的RPC协议为Dubbo，使用netty服务端和hessian2序列化。
+
+其它协议还有gRPC、RMI等。
 
 #### Dubbo vs. Spring Cloud OpenFeign
 |Dubbo|Feign
