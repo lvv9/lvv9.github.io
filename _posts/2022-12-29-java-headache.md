@@ -1221,10 +1221,11 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
   - 生产者顺序投递至同一队列（即同一分区），且需要同步发送，在同步发送成功前不能发送下一消息
   - Broker故障时消息不乱序，这种配置会影响可用性
   - 消费者顺序消费
-- 延时消息 setDelayTimeLevel()设置，在Broker内部暂存后投递到真正的Topic当中。
+- 延时消息 setDelayTimeLevel()设置，在Broker内部（内部SCHEDULE_TOPIC_XXXX主题）暂存后投递到真正的Topic当中。
 - 事务消息 RocketMQ通过生产者检查本地事务状态与"回查"的方式来实现事务消息：
   ```在断网或者是生产者应用重启的特殊情况下，若服务端未收到发送者提交的二次确认结果，或服务端收到的二次确认结果为Unknown未知状态，经过固定时间后，服务端将对消息生产者即生产者集群中任一生产者实例发起消息回查。```
   没有实现共识，理论上是不构成原子提交的，但也是业界比较常用的做法了。
+  事务消息的内部主题是RMQ_SYS_TRANS_HALF_TOPIC。
 
 ##### 可靠消息
 依旧从应用层保证，可以参考TCP。
