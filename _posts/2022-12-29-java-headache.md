@@ -1125,7 +1125,8 @@ Redis服务端只支持有限的路由服务：
 
 对于应用配置、业务参数等更新不频繁而又需要较强的一致性（主要是原子性）时，可以考虑增加版本号，将数据转换为不可变数据，继而使用缓存。
 
-#### 淘汰策略
+#### 内存管理
+达到maxmemory时的驱逐策略：
 - noeviction
 - allkeys-lru
 - allkeys-lfu
@@ -1134,6 +1135,10 @@ Redis服务端只支持有限的路由服务：
 - allkeys-random
 - volatile-random
 - volatile-ttl Removes keys with expire field set to true and the shortest remaining time-to-live (TTL) value.
+
+> Redis reclaims expired keys in two ways: upon access when those keys are
+> found to be expired, and also in background, in what is called the
+> "active expire key".
 
 #### 缓存一致性
 如果需要非常强的一致性，只能通过共识算法解决。
