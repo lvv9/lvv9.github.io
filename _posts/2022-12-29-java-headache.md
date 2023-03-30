@@ -1046,7 +1046,7 @@ https://liuweiqiang.me/2019/01/28/database-note.html & https://liuweiqiang.me/20
 ### Redis
 
 #### 数据类型
-- STRING 字符串，RedisObject封装，底层类型之一的SDS更安全、长度函数复杂度低、支持二进制、控制复杂度低
+- STRING 字符串，RedisObject封装，底层类型之一的SDS更安全、长度函数复杂度低、支持二进制、空间预分配减少了修改时内存分配的花销
 - LIST 列表，类似于Java的List
 - SET 集合，类似于Java的Set
 - HASH 哈希，类似于Java的HashMap
@@ -1244,6 +1244,14 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
 
 如果是临时的：
 - 增加队列容量
+
+##### 高并发、高吞吐实现
+- 顺序读写
+- mmap实现的零拷贝
+- 可选的异步刷盘
+- 可选的生产者异步发送
+- 可选的生产者批量发送
+- 批量消费
 
 ### Dubbo
 
