@@ -700,8 +700,12 @@ synchronized是Java语言提供的特性，Java语言只规定了synchronized语
 ### 线程池
 见 https://liuweiqiang.me/2021/11/17/java-thread-source.html
 
+在Spring异步任务中会需要配置线程池。
+
 ### ThreadLocal
 见 https://liuweiqiang.me/2020/09/08/qs&tree.html
+
+在请求的生命周期内进行context的访问时用到、Spring @Transactional也用来保存事务的上下文。
 
 ## JVM
 JVM与Java语言其实没有太大的关系，但它们都和class字节码有着重要的联系。
