@@ -1316,6 +1316,12 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
 #### Spring Boot Starter自动装配
 Spring Boot的SPI机制，通过扫描ClassLoader中Jar的META-INF/spring.factories元数据【org.springframework.boot.autoconfigure.EnableAutoConfiguration=xxx（@Configuration）】实现。
 
+#### Spring Boot(Cloud)配置优先级
+Spring Cloud有个bootstrap.yml配置，优先级如下（见演示项目 https://github.com/lvv9/spring-cloud-config）：
+1. Spring Cloud Config Server中保存的应用配置（如config-client.yml）
+2. Spring Boot中的application.yml
+3. Spring Cloud Config Client（即Spring Boot应用）中的bootstrap.yml
+
 #### 循环依赖
 主要解决思路是提前暴露对象，因此如果依赖的多方都是通过构造器注入、或者不是单例的情况就无法解决。
 
