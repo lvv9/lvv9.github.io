@@ -1323,7 +1323,7 @@ Spring Cloud有个bootstrap.yml配置，优先级如下（见演示项目 https:
 3. Spring Cloud Config Client（即Spring Boot应用）中的bootstrap.yml
 
 #### 循环依赖
-主要解决思路是提前暴露对象，因此如果依赖的多方都是通过构造器注入、或者不是单例的情况就无法解决。
+主要解决思路是提前暴露对象，因此如果依赖的多方都是通过构造器注入时就无法解决，且目前只支持单例作用域的。
 
 ## 版本号
 
