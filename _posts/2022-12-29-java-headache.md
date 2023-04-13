@@ -675,6 +675,11 @@ waitStatus：
 *   0:          None of the above
 ```
 
+#### synchronized （HotSpot）实现
+同步块：monitorenter、monitorexit指令
+修饰方法：方法修饰符ACC_SYNCHRONIZED
+虚拟机中C++实现的ObjectMonitor对象，Monitor（管程、监视器）是一种高级同步原语，为了更容易编写正确的程序。
+
 #### synchronized vs. Lock
 从上面的内容可以知道，synchronized与Lock最根本的不同在于：
 synchronized是Java语言提供的特性，Java语言只规定了synchronized语义必须符合这样的，底层JVM可以根据需要进行不同的实现以及做出各种优化；
@@ -874,7 +879,7 @@ jvms（Java虚拟机规范）规定了两种类加载器：
 有时会漏打，通过JVM的一些API（Java Agent、Attach API）可以实现一些运行时增强，如BTrace、Arthas。
 
 #### jstack查看线程状态
-在遇到应用僵死时常用。
+在遇到Java应用阻塞时常用。
 
 ##### CPU高占用
 ```shell
@@ -1256,6 +1261,7 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
 - 可选的生产者异步发送
 - 可选的生产者批量发送
 - 批量消费
+- 分区（即队列）
 
 ### Dubbo
 
