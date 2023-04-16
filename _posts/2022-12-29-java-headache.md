@@ -1021,8 +1021,14 @@ OSI分了七层：
 https://liuweiqiang.me/2019/01/28/database-note.html & https://liuweiqiang.me/2022/12/28/consistency.html
 
 #### 索引
-- B+树索引 https://liuweiqiang.me/2020/09/08/qs&tree.html
+- B+树索引（包括主键） https://liuweiqiang.me/2020/09/08/qs&tree.html
 - hash索引
+
+#### Oracle
+|-|MySQL|Oracle
+|:---:|:---:|:---:
+|默认端口|3306|1521
+隔离级别|通常意义上的4种|只有2（Read Committed、Serializable）+1（Read Only）种
 
 #### 优化
 
@@ -1043,6 +1049,15 @@ https://liuweiqiang.me/2019/01/28/database-note.html & https://liuweiqiang.me/20
 - 读写分离，使用主从复制分离读请求和写请求，也存在一些现实问题见DDIA
 - 分库分表，微服务中更多的是垂直分库，水平分叫sharding，shard后涉及到分流（路由）、再平衡、事务的问题
 
+##### Index Condition Pushdown
+> Without ICP, the storage engine traverses the index to locate rows in the base table and returns them to the MySQL server which evaluates the WHERE condition for the rows.
+> With ICP enabled, and if parts of the WHERE condition can be evaluated by using only columns from the index, the MySQL server pushes this part of the WHERE condition down to the storage engine.
+> The storage engine then evaluates the pushed index condition by using the index entry and only if this is satisfied is the row read from the table.
+> 
+> EXPLAIN output shows Using index condition in the Extra column when Index Condition Pushdown is used.
+> 
+> Index Condition Pushdown is enabled by default.
+
 #### drop vs. truncate vs. delete
 |-|drop|truncate|delete
 |:---:|:---:|:---:|:---:
@@ -1061,7 +1076,13 @@ https://liuweiqiang.me/2019/01/28/database-note.html & https://liuweiqiang.me/20
 - HASH 哈希，类似于Java的HashMap
 - ZSET 有序集合
 
-此外还有BitMap等。
+此外还有BitMap（Java中的BitSet）：
+> When key does not exist, a new string value is created.
+> The string is grown to make sure it can hold a bit at offset.
+> The offset argument is required to be greater than or equal to 0, and smaller than 2^32 (this limits bitmaps to 512MB).
+> When the string at key is grown, added bits are set to 0.
+
+HyperLogLog（提供不精确的去重计数）。
 
 #### RedisObject（数据类型底层实现）
 ```text
@@ -1083,6 +1104,12 @@ Sorted Sets can be encoded as ziplist or skiplist format. As for the List type s
 
 All the specially encoded types are automatically converted to the general type once you perform an operation that makes it impossible for Redis to retain the space saving encoding.
 ```
+
+#### 多线程
+得益于内存的利用，Redis使用单线程即可高效地执行命令：
+> Redis is, mostly, a single-threaded server from the POV of commands execution.
+
+为了获得更高的性能，除了IO多路复用，Redis 6增加了IO线程来处理IO，命令执行保持使用原来的主线程处理。
 
 #### 持久化
 - RDB（全量）
@@ -1280,7 +1307,7 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
 #### 负载均衡算法
 - 加权随机
 - 最小活跃数 请求开始活跃数增加，请求结束活跃数减少，高性能节点活跃数下降得快
-- 一致性哈希
+- 一致性哈希 对比一般的哈希算法（哈希取模），一致性哈希避免了扩\缩容发生过多数据迁移的问题，但负载并不均匀（采用虚拟节点解决）
 - 加权轮询
 
 #### 容错
