@@ -995,14 +995,25 @@ OSI分了七层：
 - 分布式事务 https://liuweiqiang.me/2022/12/28/consistency.html
 - 监控跟踪
 
-### 分布式锁
+### Distributed lock
 如果Redis客户端是Redisson，建议直接用封装好的。
 
 基本思路是通过唯一约束来实现，包括Redis的key、RDBMS的唯一索引。
 加锁时插入，解锁时删除。
 
-### 限流
-由于通常的分布式锁并无fencing token这样的保护，这样的分布式锁只能用来降低对资源的竞争而不能避免。
+使用Redis实现时，一般需要利用lua实现，ARGV用作token，防止被错误释放：
+```text
+if redis.call("get",KEYS[1]) == ARGV[1] then
+    return redis.call("del",KEYS[1])
+else
+    return 0
+end
+```
+
+Redis官方介绍了高可靠的算法：Redlock
+
+### Rate limiting
+由于通常的分布式锁并无fencing token这样的对资源保护，这样的分布式锁只能用来降低对资源的竞争而不能避免。
 
 比较成熟的方案是通过限流或消息队列来缓解。
 
