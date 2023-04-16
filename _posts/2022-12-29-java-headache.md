@@ -1355,10 +1355,17 @@ Spring Cloud有个bootstrap.yml配置，优先级如下（见演示项目 https:
 2. Spring Boot中的application.yml
 3. Spring Cloud Config Client（即Spring Boot应用）中的bootstrap.yml
 
-#### 循环依赖
-主要解决思路是提前暴露对象，因此如果依赖的多方都是通过构造器注入时就无法解决，且目前只支持单例作用域的。
+#### Circular dependency
+主要解决思路是提前暴露对象，因此如果相互依赖的Bean都是通过构造器注入时就无法解决，且目前只支持单例作用域的。
 
-## 版本号
+二三级缓存用于解决代理带来的问题，暴露早期代理对象，同时保证早期暴露的对象与最终的对象（一级缓存里的）一致：https://juejin.cn/post/6985337310472568839
+
+否则会抛：
+```text
+org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creating bean with name 'serviceA': Bean with name 'serviceA' has been injected into other beans [serviceB] in its raw version as part of a circular reference, but has eventually been wrapped. This means that said other beans do not use the final version of the bean. This is often the result of over-eager type matching - consider using 'getBeanNamesForType' with the 'allowEagerInit' flag turned off, for example.
+```
+
+## Versioning
 
 ### 语义化版本
 https://semver.org/lang/zh-CN/
