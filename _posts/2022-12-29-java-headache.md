@@ -983,6 +983,9 @@ OSI分了七层：
 #### HTTPS
 见 https://liuweiqiang.me/2021/12/23/implements-ssl-client.html
 
+### Root DNS
+根IP是Hard coded在操作系统中的。
+
 ## 微服务栈
 这里也有一些说明 https://liuweiqiang.me/2022/08/29/ddd-&-hibernate.html
 
@@ -1127,7 +1130,7 @@ All the specially encoded types are automatically converted to the general type 
 - RDB（全量）
   - save命令 阻塞主进程
   - bgsave 创建子进程后主进程解除阻塞，手动bgsave命令执行或根据配置自动执行
-- AOF（增量） 三种刷盘策略
+- AOF（增量，"logs every write operation"） 三种刷盘策略
   - appendfsync always
   - appendfsync everysec
   - appendfsync no
@@ -1280,6 +1283,9 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
   没有实现共识，理论上是不构成原子提交的，但也是业界比较常用的做法了。
   事务消息的内部主题是RMQ_SYS_TRANS_HALF_TOPIC。
 
+##### Dead-Letter Queue
+死信队列，达到最大消费重试次数的消息，对应的队列名称为 %DLQ%ConsumerGroupName 。
+
 ##### 可靠消息
 依旧从应用层保证，可以参考TCP。
 简单版：生产者数据与消息在事务数据库同步提交，生产者定时任务将消息发送，失败则重试。
@@ -1288,7 +1294,7 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
 
 ##### 积压
 基本思路是让消费速度大于生产速度：
-- 消费者扩容
+- 消费者扩容（消费者数量少于队列数量时）
 
 如果是临时的：
 - 增加队列容量
@@ -1350,9 +1356,11 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
 
 依赖注入（DI）是实现控制反转的一种方式。
 
-#### 注解
-- org.springframework.beans.factory.annotation.Autowired
-- javax.annotation.Resource
+#### Autowired vs. Resource
+|-|Autowired|Resource
+|:---:|:---:|:---:
+|包|org.springframework.beans.factory.annotation.Autowired|javax.annotation.Resource
+|多Bean处理|需要@Primary或@Qualifier配合（即byType策略）|可以用自身的name属性（即byName）
 
 #### Spring AOP vs. AspectJ
 - Spring AOP基于代理运行时增强
@@ -1370,7 +1378,7 @@ Spring Cloud有个bootstrap.yml配置，优先级如下（见演示项目 https:
 #### Circular dependency
 主要解决思路是提前暴露对象，因此如果相互依赖的Bean都是通过构造器注入时就无法解决，且目前只支持单例作用域的。
 
-二三级缓存用于解决代理带来的问题，暴露早期代理对象，同时保证早期暴露的对象与最终的对象（一级缓存里的）一致：https://juejin.cn/post/6985337310472568839
+二三级缓存用于解决代理带来的问题，暴露早期代理对象，同时保证早期暴露的对象与最终的对象（一级缓存里的）一致（因为还存在BeanPostProcessor此类后置处理器）：https://juejin.cn/post/6985337310472568839
 
 如果早期暴露的对象与最终的对象不一致，则会抛：
 ```text

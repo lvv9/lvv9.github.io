@@ -56,6 +56,7 @@
 - 面向切面编程，Spring AOP基于动态代理运行时增强，有JDK Proxy（接口）、CGLib（类）。
 - 另外有AspectJ实现切面。
 - @Transactional是一种切面。
+- @Order定义切面顺序。
 
 ## MVC
 前后端分离，Spring Rest Controller成为后端的入口，View基本由前端实现，Controller返回业务数据Model。
