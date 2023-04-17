@@ -1057,8 +1057,9 @@ https://liuweiqiang.me/2019/01/28/database-note.html & https://liuweiqiang.me/20
 - 减少数据量，如覆盖索引、只select必要的列、分页等
 - 减少网络IO，如在程序循环外一次性读取而不是循环中读取、batchInsert代替循环insert
 - 使用预编译SQL而不是动态SQL
-- 读写分离，使用主从复制分离读请求和写请求，也存在一些现实问题见DDIA
-- 分库分表，微服务中更多的是垂直分库，水平分叫sharding，shard后涉及到分流（路由）、再平衡、事务的问题
+- 读写分离，使用主从复制分离读请求和写请求，也存在一些现实问题见DDIA（个人想法：读写分离不如CQRS）
+- 分库分表，水平分叫sharding，shard后涉及到分流（路由）、再平衡、事务的问题
+  按服务分库较为常见；水平分库在数据库层（如TDSQL）用过，上层透明。
 
 ##### Index Condition Pushdown
 > Without ICP, the storage engine traverses the index to locate rows in the base table and returns them to the MySQL server which evaluates the WHERE condition for the rows.
@@ -1371,7 +1372,7 @@ Spring Cloud有个bootstrap.yml配置，优先级如下（见演示项目 https:
 
 二三级缓存用于解决代理带来的问题，暴露早期代理对象，同时保证早期暴露的对象与最终的对象（一级缓存里的）一致：https://juejin.cn/post/6985337310472568839
 
-否则会抛：
+如果早期暴露的对象与最终的对象不一致，则会抛：
 ```text
 org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creating bean with name 'serviceA': Bean with name 'serviceA' has been injected into other beans [serviceB] in its raw version as part of a circular reference, but has eventually been wrapped. This means that said other beans do not use the final version of the bean. This is often the result of over-eager type matching - consider using 'getBeanNamesForType' with the 'allowEagerInit' flag turned off, for example.
 ```
