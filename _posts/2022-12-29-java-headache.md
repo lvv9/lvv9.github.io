@@ -1139,6 +1139,17 @@ All the specially encoded types are automatically converted to the general type 
 #### 部署
 - 单机 可用性低
 - 主从 从节点发送PSYNC，主节点发送RDB及增量，不能自动故障转移
+  > PSYNC replicationid offset
+
+  replicationid可以当作任期，不过是伪随机生成的。
+  ```text
+  When replicas connect to masters, they use the PSYNC command to send their old master replication ID and the offsets they processed so far.
+  This way the master can send just the incremental part needed.
+  However if there is not enough backlog in the master buffers, or if the replica is referring to an history (replication ID) which is no longer known, then a full resynchronization happens.
+  
+  It is not possible to partially sync a replica that restarted via the AOF file.
+  However the instance may be turned to RDB persistence before shutting down it, than can be restarted, and finally AOF can be enabled again.
+  ```
 - 哨兵 并发依旧不高，容量依旧不大，机器利用率低
 - 集群 至少3主3从
 
