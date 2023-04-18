@@ -495,7 +495,6 @@ public class Singleton {
 - 循环等待
 
 #### 解决死锁
-
 死锁防止，破坏上面四个条件之一：
 - 如使用ThreadLocal或String这样的不可变对象
 - 开始前一次性申请所有资源的锁
