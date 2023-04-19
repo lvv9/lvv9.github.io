@@ -686,7 +686,7 @@ synchronized是Java语言提供的特性，Java语言只规定了synchronized语
 
 对比JVM实现与Lock实现：
 
-|维度|synchronized|Lock
+|-|synchronized|Lock
 |:---:|:---:|:---:
 |中断|不支持|支持
 |超时|不支持|支持
@@ -696,10 +696,11 @@ synchronized是Java语言提供的特性，Java语言只规定了synchronized语
 |condition|一个|多个
 
 #### 常见基于AQS的工具
-- ReentrantLock（CyclicBarrier）
-- Semaphore（互斥锁是一个特殊的信号量，二元信号量）
-- CountDownLatch
+- ReentrantLock
 - ReentrantReadWriteLock
+- Semaphore（互斥锁是一个特殊的信号量，二元信号量）
+- CountDownLatch（await阻塞直至countDown至0）
+- CyclicBarrier（await阻塞直至await至0）
 
 ### 线程池
 见 https://liuweiqiang.me/2021/11/17/java-thread-source.html
@@ -1388,7 +1389,7 @@ Spring Cloud有个bootstrap.yml配置，优先级如下（见演示项目 https:
 #### Circular dependency
 主要解决思路是提前暴露对象，因此如果相互依赖的Bean都是通过构造器注入时就无法解决，且目前只支持单例作用域的。
 
-二三级缓存用于解决代理带来的问题，暴露早期代理对象，同时保证早期暴露的对象与最终的对象（一级缓存里的）一致（因为还存在BeanPostProcessor此类后置处理器）：https://juejin.cn/post/6985337310472568839
+二三级缓存用于解决代理带来的问题，暴露早期代理对象，同时保证早期暴露的对象与最终的对象（一级缓存里的）一致（因为还存在BeanPostProcessor此类后置处理器）：[Spring中的循环依赖及解决](https://juejin.cn/post/6985337310472568839)
 
 如果早期暴露的对象与最终的对象不一致，则会抛：
 ```text

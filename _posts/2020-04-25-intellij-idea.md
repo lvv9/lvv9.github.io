@@ -17,7 +17,7 @@ Maven Helper 查看Maven工程依赖情况。
 ### Module
 IDEA对Maven模块有较好的支持，添加模块后会自动对POM进行处理。<br>
 关于Maven的“模块”，可以理解为继承和组合，即大工程可以是小工程的父工程，也可以是小工程的组合（聚合），或者都是。<br>
-可以参考：https://my.oschina.net/mzdbxqh/blog/846018
+可以参考：[Maven 之依赖配置 - 关于依赖传递、依赖范围和类加载器](https://my.oschina.net/mzdbxqh/blog/846018)
 
 ### Build
 Maven挺复杂的，但IDEA对Maven的构建也有一定程度的支持，如支持资源filter。<br>
