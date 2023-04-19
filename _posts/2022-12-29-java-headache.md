@@ -676,8 +676,10 @@ waitStatus：
 
 #### synchronized （HotSpot）实现
 同步块：monitorenter、monitorexit指令
+
 修饰方法：方法修饰符ACC_SYNCHRONIZED
-虚拟机中C++实现的ObjectMonitor对象，Monitor（管程、监视器）是一种高级同步原语，为了更容易编写正确的程序。
+
+最重要的是虚拟机中C++实现的ObjectMonitor对象，Monitor（管程、监视器）是一种高级同步原语，为了更容易编写正确的程序。
 
 #### synchronized vs. Lock
 从上面的内容可以知道，synchronized与Lock最根本的不同在于：
@@ -761,7 +763,7 @@ JVM实现可以自由地决定不在规范中描述的细节，如运行时的�
 #### HotSpot内存参数
 - -Xss Java虚拟机栈大小
 - -Xms、-Xmx Java堆最小最大大小
-  - -Xmn 新生代大小，即将将-XX:NewSize与-XX:MaxNewSize设为一致
+  - -Xmn 新生代大小，即将-XX:NewSize与-XX:MaxNewSize设为一致
 - -XX:MaxMetaspaceSize 元空间（方法区的HotSpot实现）大小，默认无上限
 - -MaxDirectMemorySize 直接内存，不属于运行时数据区，New IO中的DirectByteBuffer对象会用到，直接内存受此参数与本地内存的限制
 
