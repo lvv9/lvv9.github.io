@@ -701,8 +701,8 @@ synchronized是Java语言提供的特性，Java语言只规定了synchronized语
 - ReentrantLock
 - ReentrantReadWriteLock
 - Semaphore（互斥锁是一个特殊的信号量，二元信号量）
-- CountDownLatch（await阻塞直至countDown至0）
-- CyclicBarrier（await阻塞直至await至0）
+- CountDownLatch（await阻塞直至countDown至0，不可重置）
+- CyclicBarrier（await阻塞直至await至0，可重置）
 
 ### 线程池
 见 https://liuweiqiang.me/2021/11/17/java-thread-source.html
@@ -1035,6 +1035,19 @@ Redis官方介绍了高可靠的算法：Redlock
 
 #### 事务
 https://liuweiqiang.me/2019/01/28/database-note.html & https://liuweiqiang.me/2022/12/28/consistency.html
+
+#### Intention Locks
+意向锁用来高效地实现表锁与行锁的冲突检测，申请行级锁时需要先申请表级意向锁。它们的相容性：
+
+|-|（表级）X|IX|（表级）S|IS
+|:---:|:---:|:---:|:---:|:---:
+|（表级）X|Conflict|Conflict|Conflict|Conflict
+|IX|Conflict|Compatible|Conflict|Compatible
+|（表级）S|Conflict|Conflict|Compatible|Compatible
+|IS|Conflict|Compatible|Compatible|Compatible
+
+#### Insert Intention Locks
+用来实现插入和间隙锁的冲突检测。
 
 #### 索引
 - B+树索引（包括主键） https://liuweiqiang.me/2020/09/08/qs&tree.html
