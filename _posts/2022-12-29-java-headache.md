@@ -1218,38 +1218,6 @@ Redis服务端只支持有限的路由服务：
 #### lua
 Redis的命令执行模型是单线程的，但在应用组合多命令时没有原子性，这时可以通过lua来完成。
 
-### ZooKeeper
-
-#### 应用
-- 分布式锁
-- 分布式序列
-- 配置中心
-
-#### 节点类型
-Zookeeper的数据模型是由树形的多个znode节点组成的。节点的类型包括从两个维度组合包括：
-- 临时节点
-- 永久节点
-- 临时顺序节点
-- 永久顺序节点
-
-节点可以注册watcher，以利用ZK的通知机制。
-
-#### ZAB
-https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
-
-##### 角色
-- Leader 负责事务的提交
-- Follower 转发事务请求，同步状态，处理读请求，参与提议与选举
-- Observer 转发事务请求，同步状态，处理读请求，不参与提议与选举
-
-##### 工作状态
-- Active messaging 集群工作在这种状态时，Leader按（改进的）两阶段提交的方式进行：
-  1. Leader按事务ID——zxid（epoch+count组成）顺序提议（写请求）
-  2. Follower按序回复，过半通过后Leader发送COMMIT
-- Leader activation 启动、恢复时进入这种状态进行Leader选举，选举后Leader需先将状态同步到Follower。
-  选举选出服务器最新事务ID中的epoch任期最大的，epoch有相同的则选出事务ID中的count最大的，接着是机器ID最大的。
-  如果Leader在其任内出现任期大于它的事务，且这个Leader任内zxid最大的那部分提议没有被任一参与投票的Follower COMMIT，说明已有新的Leader，那么这部分过期的提议会被放弃。
-
 ### 消息队列
 一般应用于：
 - 异步 有助于实现响应式的风格
@@ -1300,7 +1268,7 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
 死信队列，达到最大消费重试次数的消息，对应的队列名称为 %DLQ%ConsumerGroupName 。
 
 ##### 可靠消息
-依旧从应用层保证，可以参考TCP。
+依旧从应用层保证（从而实现端到端的可靠），可以参考TCP。
 简单版：生产者数据与消息在事务数据库同步提交，生产者定时任务将消息发送，失败则重试。
 在得到消费者明确的成功返回（或退而求其次Broker的返回，同时Broker配置高可靠）后删除消息或改变消息状态（或者消费者调生产者服务）。
 消费者实现幂等。
@@ -1355,11 +1323,13 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
 
 其它协议还有gRPC、RMI等。
 
-#### Dubbo vs. Spring Cloud OpenFeign
+#### Dubbo vs. Spring Cloud(OpenFeign)
+[与 gRPC、Spring Cloud、Istio 的关系](https://cn.dubbo.apache.org/zh-cn/overview/what/xyz-difference/)
+
 |Dubbo|Feign
 |:---:|:---:
 |RPC风格，耦合较高|RESTful
-|还包括了负载均衡等|需要其它组件配合
+|还包括了负载均衡、监控等|需要其它组件配合
 |倾向于自定义协议，更容易获得高性能|HTTP
 
 ### Spring
@@ -1397,6 +1367,38 @@ Spring Cloud有个bootstrap.yml配置，优先级如下（见演示项目 https:
 ```text
 org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creating bean with name 'serviceA': Bean with name 'serviceA' has been injected into other beans [serviceB] in its raw version as part of a circular reference, but has eventually been wrapped. This means that said other beans do not use the final version of the bean. This is often the result of over-eager type matching - consider using 'getBeanNamesForType' with the 'allowEagerInit' flag turned off, for example.
 ```
+
+### ZooKeeper
+
+#### 应用
+- 分布式锁
+- 分布式序列
+- 配置中心
+
+#### 节点类型
+Zookeeper的数据模型是由树形的多个znode节点组成的。节点的类型包括从两个维度组合包括：
+- 临时节点
+- 永久节点
+- 临时顺序节点
+- 永久顺序节点
+
+节点可以注册watcher，以利用ZK的通知机制。
+
+#### ZAB
+https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
+
+##### 角色
+- Leader 负责事务的提交
+- Follower 转发事务请求，同步状态，处理读请求，参与提议与选举
+- Observer 转发事务请求，同步状态，处理读请求，不参与提议与选举
+
+##### 工作状态
+- Active messaging 集群工作在这种状态时，Leader按（改进的）两阶段提交的方式进行：
+    1. Leader按事务ID——zxid（epoch+count组成）顺序提议（写请求）
+    2. Follower按序回复，过半通过后Leader发送COMMIT
+- Leader activation 启动、恢复时进入这种状态进行Leader选举，选举后Leader需先将状态同步到Follower。
+  选举选出服务器最新事务ID中的epoch任期最大的，epoch有相同的则选出事务ID中的count最大的，接着是机器ID最大的。
+  如果Leader在其任内出现任期大于它的事务，且这个Leader任内zxid最大的那部分提议没有被任一参与投票的Follower COMMIT，说明已有新的Leader，那么这部分过期的提议会被放弃。
 
 ## Versioning
 
