@@ -446,7 +446,7 @@ Tips：notify是"不可靠的"，被notify的对象可能会错过notify信号�
 #### TIMED_WAITING
 同上，不过带时间参数，Thread.sleep时也是。
 
-### Java内存模型
+### Java Memory Model
 和分布式系统一样，在并发处理器下，不同的模型会有不同的一致性级别。
 简单地说，JMM是一种模型，抽象出了Java程序员与JVM实现之间的契约。
 > The Java Memory Model describes what behaviors are legal in multithreaded code, and how threads may interact through memory. It describes the relationship between variables in a program and the low-level details of storing and retrieving them to and from memory or registers in a real computer system. It does this in a way that can be implemented correctly using a wide variety of hardware and a wide variety of compiler optimizations.
@@ -737,7 +737,7 @@ JVM规范描述的是一种抽象化的虚拟机的行为，而不是任何一�
 JVM实现可以自由地决定不在规范中描述的细节，如运行时的数据区如何布局，选用哪种垃圾收集算法，优化等。
 详见《Java虚拟机规范（Java SE 8版）》
 
-### 运行时数据区
+### Runtime Data Area
 即运行时会用到的数据的区域，其中一些区域与虚拟机进程的生命周期绑定，另外一些与线程的绑定。
 - pc寄存器 其值可以用三元表达式表达（运行方法是native? undefined: 字节码指令地址），与线程绑定
 - Java虚拟机栈（线程）
@@ -908,7 +908,7 @@ ps -eT Huk -pcpu | more # 按CPU占用排序查看线程
 还可以通过专业工具的火焰图分析。
 
 #### JDK内存分析工具
-分析OOM与内存泄漏时常用，见上《运行时数据区》。
+分析OOM与内存泄漏时常用，见《[Runtime Data Area](#runtime-data-area)》。
 
 #### GC日志
 同样也是分析内存问题时常用，需JVM参数
