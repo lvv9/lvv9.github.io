@@ -647,6 +647,21 @@ ReentrantLock(fair)中同步器FairSync的lock()会落到acquire(1)：
     }
 ```
 
+LockSupport的park中有参数blocker
+```text
+    public static void park(Object blocker) {
+        Thread t = Thread.currentThread();
+        setBlocker(t, blocker);
+        UNSAFE.park(false, 0L);
+        setBlocker(t, null);
+    }
+```
+
+作用是
+> This object is recorded while the thread is blocked to permit monitoring and diagnostic tools to identify the reasons that threads are blocked. (Such tools may access blockers using method getBlocker(Thread).)
+
+这样就可以在jstack中看到哪些地方发生了死锁。
+
 waitStatus：
 ```text
 * Status field, taking on only the values:
@@ -881,7 +896,7 @@ jvms（Java虚拟机规范）规定了两种类加载器：
 有时会漏打，通过JVM的一些API（Java Agent、Attach API）可以实现一些运行时增强，如BTrace、Arthas。
 
 #### jstack查看线程状态
-在遇到Java应用阻塞时常用。
+在遇到Java应用死锁、阻塞时常用。
 
 ##### CPU高占用
 ```shell
