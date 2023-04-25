@@ -1396,6 +1396,14 @@ Spring Cloud有个bootstrap.yml配置，优先级如下（见演示项目 https:
 org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creating bean with name 'serviceA': Bean with name 'serviceA' has been injected into other beans [serviceB] in its raw version as part of a circular reference, but has eventually been wrapped. This means that said other beans do not use the final version of the bean. This is often the result of over-eager type matching - consider using 'getBeanNamesForType' with the 'allowEagerInit' flag turned off, for example.
 ```
 
+#### @Transactional失效
+- 同类调用，因为是this方法，无法调用代理后的方法。可以：
+  - 修改代码结构
+  - Autowired注入自己（的代理）
+  - ApplicationContext或其它方式获取自己（的代理）
+- 注解在非public方法
+- 抛出了非RuntimeException，需要使用@Transactional rollbackFor参数
+
 ### ZooKeeper
 
 #### 应用
