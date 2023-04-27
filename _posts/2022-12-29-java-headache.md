@@ -1011,9 +1011,10 @@ OSI分了七层：
 - RPC/REST
 - 消息队列
 - 数据库（包括RDBMS和NoSQL）
-- 注册中心、配置中心
+- 注册中心
+- 配置中心
 - 分布式事务 https://liuweiqiang.me/2022/12/28/consistency.html
-- 监控跟踪
+- 监控跟踪（Spring Cloud有Sleuth+Zipkin，或者SkyWalking）
 
 ### Distributed lock
 如果Redis客户端是Redisson，建议直接用封装好的。
@@ -1410,6 +1411,7 @@ org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creati
 - 分布式锁
 - 分布式序列
 - 配置中心
+- 注册中心
 
 #### 节点类型
 Zookeeper的数据模型是由树形的多个znode节点组成的。节点的类型包括从两个维度组合包括：
