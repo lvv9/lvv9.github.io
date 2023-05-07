@@ -1,5 +1,12 @@
 # 令人头疼的问题
 
+## OOP
+- 封装
+- 继承
+- 多态 运行时绑定
+
+在动态面向对象语言中，多态不必通过继承实现，详情可查询关于duck typing的讨论。
+
 ## 集合
 
 ### ArrayList
@@ -366,6 +373,15 @@ TreeMap底层是红黑树，与HashMap中的红黑树类似，在增删元素后
 - ConcurrentLinkedQueue（CAS）
 - BlockingQueue（ArrayBlockingQueue、LinkedBlockingQueue、PriorityBlockingQueue）
 
+## 反射
+主要用在框架，如Spring、Hibernate、MyBatis、Dubbo、Mockito、Jackson，使它们在运行时能动态地操作类。
+
+### 动态代理
+- java.lang.reflect.Proxy
+  生成新的类（代理类），代理类继承Proxy实现被代理的接口。因此无法代理类只能代理接口。
+- ASM
+  包括CGLib、Byte Buddy，直接操作字节码，因此能代理几乎所有的类。
+
 ## 多线程并发
 
 ### 线程状态
@@ -725,7 +741,6 @@ synchronized是Java语言提供的特性，Java语言只规定了synchronized语
 应用：
 - 在Spring异步任务中会需要配置线程池
 - Web，容器在请求层面做了多线程处理
-- 实验性使用
 
 ### ThreadLocal
 见 https://liuweiqiang.me/2020/09/08/qs&tree.html
@@ -1407,6 +1422,11 @@ org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creati
   - ApplicationContext或其它方式获取自己（的代理）
 - 注解在非public方法
 - 抛出了非RuntimeException，需要使用@Transactional rollbackFor参数
+
+#### AOP
+- @Aspect 注解前面类
+- @Before、@After、@AfterRunning、@AfterThrowing、@Around 五种通知
+- @PointCut、通知的pointcut参数 切入点
 
 ### ZooKeeper
 
