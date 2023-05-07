@@ -64,7 +64,7 @@ new Thread(() -> System.out.println("hello world")).start();
      */
     public ThreadPoolExecutor(int corePoolSize,
                               int maximumPoolSize,
-                              long keepAliveTime,
+                              long keepAliveTime, // 不只是greater than the core，如果设置了allowCoreThreadTimeOut同样会
                               TimeUnit unit,
                               BlockingQueue<Runnable> workQueue,
                               ThreadFactory threadFactory,
@@ -204,6 +204,12 @@ new Thread(() -> System.out.println("hello world")).start();
 否则加入任务队列；
 如果加入失败队列满了，则启动非核心线程；
 如果启动失败线程数大于最大线程数，则拒绝。
+
+拒绝策略：
+- AbortPolicy
+- CallerRunsPolicy
+- DiscardOldestPolicy
+- DiscardPolicy
 
 线程池的shutdown()方法用来使RUNNING状态转到SHUTDOWN状态，而shutdownNow()是把它转到STOP状态，但这里的STOP，也只是调用线程的interrupt():
 ```text
@@ -424,7 +430,7 @@ Worker的这个设计，应该是种模式，ThreadLocal中也有。<br>
     }
 ```
 在线程池处于RUNNING或SHUTDOWN的情况，并且正常执行任务的条件下（还有小于min的情况），再次调用addWorker()，这次firstTask的参数是null。<br>
-addWorker再次start线程后，新建的Worker的runWorker()中，因为firstTask是null，getTask（）阻塞获取任务：
+addWorker再次start线程后，新建的Worker的runWorker()中，因为firstTask是null，getTask()阻塞获取任务：
 ```text
     /**
      * Performs blocking or timed wait for a task, depending on

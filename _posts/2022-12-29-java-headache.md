@@ -722,7 +722,10 @@ synchronized是Java语言提供的特性，Java语言只规定了synchronized语
 ### 线程池
 见 https://liuweiqiang.me/2021/11/17/java-thread-source.html
 
-在Spring异步任务中会需要配置线程池。
+应用：
+- 在Spring异步任务中会需要配置线程池
+- Web，容器在请求层面做了多线程处理
+- 实验性使用
 
 ### ThreadLocal
 见 https://liuweiqiang.me/2020/09/08/qs&tree.html

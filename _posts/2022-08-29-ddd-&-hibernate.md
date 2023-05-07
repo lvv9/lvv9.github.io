@@ -106,6 +106,8 @@ James Lewis和Martin Fowler的《Microservices》还指出微服务应具备的�
 - Ambassador及Sidecar 
 - 防腐层 在不共享相同语义的不同子系统之间实施外观或适配器层
 - BFF 创建单独的后端服务，供特定的前端应用程序或接口使用
+  - [BFF（Backends for frontends）避坑指南](https://www.maguangguang.xyz/backend-for-frontend)
+  - [BFF治理与优化实践](https://www.maguangguang.xyz/bff-governance)
 
 ### REST
 在比较经典的开发实践中，可能会遇到这样的情况：
