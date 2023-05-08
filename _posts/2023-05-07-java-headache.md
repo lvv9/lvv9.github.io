@@ -7,6 +7,9 @@
 
 在动态面向对象语言中，多态不必通过继承实现，详情可查询关于duck typing的讨论。
 
+## IO
+https://liuweiqiang.me/2022/03/31/java-io.html
+
 ## 集合
 
 ### ArrayList
