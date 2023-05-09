@@ -1436,7 +1436,7 @@ org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creati
 - 抛出了非RuntimeException，需要使用@Transactional rollbackFor参数
 
 #### AOP
-- @Aspect 注解前面类
+- @Aspect 切面类
 - @Before、@After、@AfterRunning、@AfterThrowing、@Around 五种通知
 - @PointCut、通知的pointcut参数 切入点
 
