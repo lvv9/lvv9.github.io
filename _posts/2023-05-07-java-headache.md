@@ -1109,6 +1109,13 @@ https://liuweiqiang.me/2019/01/28/database-note.html & https://liuweiqiang.me/20
 
 ##### 慢查询日志
 对于MySQL的分析，其中一种是通过自带的慢查询日志（slow_query_log）来查看记录的慢查询。
+The server uses the controlling parameters in the following order to determine whether to write a query to the slow query log:
+1. The query must either not be an administrative statement, or log_slow_admin_statements must be enabled.
+2. The query must have taken at least long_query_time seconds, or log_queries_not_using_indexes must be enabled and the query used no indexes for row lookups.
+3. The query must have examined at least min_examined_row_limit rows.
+4. The query must not be suppressed according to the log_throttle_queries_not_using_indexes setting.
+
+这里的long_query_time是指实际的执行时间（=总耗时-锁阻塞时间）。
 
 ##### Explain
 查看执行计划。
