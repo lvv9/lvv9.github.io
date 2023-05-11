@@ -383,7 +383,7 @@ TreeMap底层是红黑树，与HashMap中的红黑树类似，在增删元素后
 - java.lang.reflect.Proxy
   生成新的类（代理类），代理类继承Proxy实现被代理的接口。因此无法代理类只能代理接口。
 - ASM
-  包括CGLib、Byte Buddy，直接操作字节码，因此能代理几乎所有的类。
+  包括CGLib、Byte Buddy，直接操作字节码生成新的类，代理类继承被代理类。因此能代理几乎所有的类。
 
 ## 多线程并发
 
