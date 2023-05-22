@@ -80,7 +80,7 @@ Vernon将子域看作是问题空间。
 左侧，应用层API通过输入适配器接收输入。右侧，持久化、消息通过输出适配器完成转化。
 
 ### 服务架构
-服务架构一般是针对单体应用来说的。
+（微）服务架构一般是针对单体应用来说的。
 > 剖析单体架构之前，我们有必要先厘清一个概念误区，许多微服务的资料里，单体系统往往是以“反派角色”的身份登场的，譬如著名的微服务入门书《微服务架构设计模式》，第一章的名字就是“逃离单体的地狱”。这些材料所讲的单体系统，其实都是有一个没有明说的隐含定语：“大型的单体系统”。
 > ——icyfenix.cn
 
@@ -95,6 +95,8 @@ James Lewis和Martin Fowler的《Microservices》还指出微服务应具备的�
 > How big is a microservice?
 > Although “microservice” has become a popular name for this architectural style, its name does lead to an unfortunate focus on the size of service, and arguments about what constitutes “micro”. In our conversations with microservice practitioners, we see a range of sizes of services. The largest sizes reported follow Amazon's notion of the Two Pizza Team (i.e. the whole team can be fed by two pizzas), meaning no more than a dozen people. On the smaller size scale we've seen setups where a team of half-a-dozen would support half-a-dozen services.
 > This leads to the question of whether there are sufficiently large differences within this size range that the service-per-dozen-people and service-per-person sizes shouldn't be lumped under one microservices label. At the moment we think it's better to group them together, but it's certainly possible that we'll change our mind as we explore this style further.
+
+在操作系统内核领域，还有一种称为微内核的架构。它和微服务架构中都强调了"微"。
 
 #### 微服务其它模式
 和通常和微服务一起应用的模式有（ https://azure.microsoft.com/en-us/blog/design-patterns-for-microservices/ ）：

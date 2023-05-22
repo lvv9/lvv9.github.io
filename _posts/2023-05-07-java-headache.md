@@ -1480,12 +1480,21 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
   选举选出服务器最新事务ID中的epoch任期最大的，epoch有相同的则选出事务ID中的count最大的，接着是机器ID最大的。
   如果Leader在其任内出现任期大于它的事务，且这个Leader任内zxid最大的那部分提议没有被任一参与投票的Follower COMMIT，说明已有新的Leader，那么这部分过期的提议会被放弃。
 
-## Versioning
+## 软件工程
 
-### 语义化版本
+### Versioning
+
+#### 语义化版本
 https://semver.org/lang/zh-CN/
 
 版本格式：主版本号.次版本号.修订号，版本号递增规则如下：
 1. 主版本号：当你做了不兼容的 API 修改，
 2. 次版本号：当你做了向下兼容的功能性新增，
 3. 修订号：当你做了向下兼容的问题修正。
+
+### 可维护性
+可维护性在DDIA中包括：
+- 可运维性
+- 简单性
+- 可演化性
+  为了更好的演化，通常需要考虑前向和后向兼容性。特别是前向兼容性，它要求旧代码能够在运行新的数据集上。
