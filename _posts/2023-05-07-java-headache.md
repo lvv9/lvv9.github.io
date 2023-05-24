@@ -1096,8 +1096,19 @@ https://liuweiqiang.me/2019/01/28/database-note.html & https://liuweiqiang.me/20
 用来实现插入和间隙锁的冲突检测。
 
 #### 索引
-- B+树索引（包括主键） https://liuweiqiang.me/2020/09/08/qs&tree.html
-- hash索引
+主要是用B+树结构实现（包括主键） https://liuweiqiang.me/2020/09/08/qs&tree.html
+
+InnoDB的索引：
+
+|Index Class|Index Type
+|:---:|:---:
+|Primary key|BTREE
+|Unique|BTREE
+|Key|BTREE
+|FULLTEXT|N/A
+|SPATIAL|N/A
+
+HASH索引只出现在MEMORY和NDB存储引擎。
 
 #### Oracle
 |-|MySQL|Oracle
@@ -1140,6 +1151,28 @@ The server uses the controlling parameters in the following order to determine w
 > EXPLAIN output shows Using index condition in the Extra column when Index Condition Pushdown is used.
 > 
 > Index Condition Pushdown is enabled by default.
+
+#### 内部临时表
+在使用Explain优化时会看到Extra中有Using temporary，是执行过程中创建的临时数据，在以下情况下可能会出现：
+> - Evaluation of UNION statements, with some exceptions described later.
+> - Evaluation of some views, such those that use the TEMPTABLE algorithm, UNION, or aggregation.
+> - Evaluation of derived tables.
+> - Tables created for subquery or semijoin materialization.
+> - Evaluation of statements that contain an ORDER BY clause and a different GROUP BY clause, or for which the ORDER BY or GROUP BY contains columns from tables other than the first table in the join queue.
+> - Evaluation of DISTINCT combined with ORDER BY may require a temporary table.
+> - For queries that use the SQL_SMALL_RESULT modifier, MySQL uses an in-memory temporary table, unless the query also contains elements (described later) that require on-disk storage.
+> - To evaluate INSERT ... SELECT statements that select from and insert into the same table, MySQL creates an internal temporary table to hold the rows from the SELECT, then inserts those rows into the target table.
+> - Evaluation of multiple-table UPDATE statements.
+> - Evaluation of GROUP_CONCAT() or COUNT(DISTINCT) expressions.
+
+> These conditions qualify a UNION for evaluation without a temporary table:
+> - The union is UNION ALL, not UNION or UNION DISTINCT.
+> - There is no global ORDER BY clause.
+> - The union is not the top-level query block of an {INSERT | REPLACE} ... SELECT ... statement.
+
+同时，临时表的存储引擎有：
+- MEMORY及TempTable（MySQL 8才有TempTable）等内存引擎（变量internal_tmp_mem_storage_engine）
+- InnoDB及MyISAM（MySQL 8.0.16后只有InnoDB）等硬盘引擎（变量internal_tmp_disk_storage_engine）
 
 #### drop vs. truncate vs. delete
 |-|drop|truncate|delete
@@ -1497,4 +1530,5 @@ https://semver.org/lang/zh-CN/
 - 可运维性
 - 简单性
 - 可演化性
-  为了更好的演化，通常需要考虑前向和后向兼容性。特别是前向兼容性，它要求旧代码能够在运行新的数据集上。
+  为了更好的演化，通常需要考虑前向和后向兼容性。
+  特别是前向兼容性，它要求旧代码能够在运行新的数据集上。
