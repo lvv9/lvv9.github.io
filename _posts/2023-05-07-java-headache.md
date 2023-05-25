@@ -1130,6 +1130,7 @@ The server uses the controlling parameters in the following order to determine w
 
 ##### Explain
 查看执行计划。
+有许多方式能改进语句的性能，如修改某些MySQL变量等。但作为开发人员经常使用的是优化DML语句和表结构。
 
 ##### 数据库优化
 包括但不限于
@@ -1142,6 +1143,11 @@ The server uses the controlling parameters in the following order to determine w
 - 读写分离，使用主从复制分离读请求和写请求，也存在一些现实问题见DDIA（个人想法：读写分离不如CQRS）
 - 分库分表，水平分叫sharding，shard后涉及到分流（路由）、再平衡、事务的问题
   按服务分库较为常见；水平分库在数据库层（如TDSQL）用过，上层透明。
+
+MySQL还提供了一些方法来影响执行计划，如：
+- STRAIGHT_JOIN控制连接的顺序
+- ANALYZE操作统计信息
+- USE INDEX、FORCE INDEX
 
 ##### Index Condition Pushdown
 > Without ICP, the storage engine traverses the index to locate rows in the base table and returns them to the MySQL server which evaluates the WHERE condition for the rows.
@@ -1532,3 +1538,10 @@ https://semver.org/lang/zh-CN/
 - 可演化性
   为了更好的演化，通常需要考虑前向和后向兼容性。
   特别是前向兼容性，它要求旧代码能够在运行新的数据集上。
+
+### 项目超期
+- 延长工期
+- 奖金激励
+- 裁剪低价值需求、特性
+- 增加人力等资源
+- 加班
