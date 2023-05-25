@@ -1360,7 +1360,7 @@ Redis的命令执行模型是单线程的，但在应用组合多命令时没有
 ##### 特色消息
 - 顺序消息 顺序消息的代价太高，建议在应用层保证，不要依赖中间件的顺序性保证。 https://liuweiqiang.me/2022/03/16/kafka-in-action.html
   RocketMQ的顺序保证只能保证同一生产者的顺序性，且需要满足：
-  - 生产者顺序投递至同一队列（即同一分区），且需要同步发送，在同步发送成功前不能发送下一消息
+  - 生产者顺序投递至同一队列（即同一分区，需要实现RockMQ的接口），且需要同步发送，在同步发送成功前不能发送下一消息
   - Broker故障时消息不乱序，这种配置会影响可用性
   - 消费者顺序消费
 - 延时消息 setDelayTimeLevel()设置，在Broker内部（内部SCHEDULE_TOPIC_XXXX主题）暂存后投递到真正的Topic当中。
@@ -1427,6 +1427,8 @@ Redis的命令执行模型是单线程的，但在应用组合多命令时没有
 默认的RPC协议为Dubbo，使用netty服务端和hessian2序列化。
 
 其它协议还有gRPC、RMI等。
+
+PS：netty和jetty没有关系，jetty是servlet容器，对标tomcat，netty利用了Java NIO，实现（asynchronous event-driven network application framework）。
 
 #### Dubbo vs. Spring Cloud(OpenFeign)
 [与 gRPC、Spring Cloud、Istio 的关系](https://cn.dubbo.apache.org/zh-cn/overview/what/xyz-difference/)
@@ -1540,8 +1542,8 @@ https://semver.org/lang/zh-CN/
   特别是前向兼容性，它要求旧代码能够在运行新的数据集上。
 
 ### 项目超期
-- 延长工期
 - 奖金激励
 - 裁剪低价值需求、特性
+- 延长工期
 - 增加人力等资源
 - 加班
