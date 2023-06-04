@@ -1112,6 +1112,14 @@ InnoDB的索引：
 
 HASH索引只出现在MEMORY和NDB存储引擎。
 
+##### 聚簇索引
+又称为主索引，指记录的顺序与这个索引的顺序相同。
+在MySQL中，主键是聚簇的，同时也是B+树，这样子的话搜索到相应的主键值后，可以得到记录的全部内容。
+而对于非聚簇索引，在搜索到相应的键值后，得到的value是主键值，需要"回表"。
+> 1. When you define a PRIMARY KEY on a table, InnoDB uses it as the clustered index. A primary key should be defined for each table. If there is no logical unique and non-null column or set of columns to use a the primary key, add an auto-increment column. Auto-increment column values are unique and are added automatically as new rows are inserted.
+> 2. If you do not define a PRIMARY KEY for a table, InnoDB uses the first UNIQUE index with all key columns defined as NOT NULL as the clustered index.
+> 3. If a table has no PRIMARY KEY or suitable UNIQUE index, InnoDB generates a hidden clustered index named GEN_CLUST_INDEX on a synthetic column that contains row ID values. The rows are ordered by the row ID that InnoDB assigns. The row ID is a 6-byte field that increases monotonically as new rows are inserted. Thus, the rows ordered by the row ID are physically in order of insertion.
+
 #### Oracle
 |-|MySQL|Oracle
 |:---:|:---:|:---:
@@ -1420,7 +1428,7 @@ Redis的命令执行模型是单线程的，但在应用组合多命令时没有
 - Failover 自动切换并重试，成功后返回成功结果
 - Failfast 快速失败，抛出异常
 - Failsafe 失败安全，忽略异常，返回默认结果
-- Failback 失败自动恢复，先返回默认结果，使用另外的线程定时重试
+- Failback 失败自动恢复，先返回默认结果，使用另外的线程定时重试（可能涉及指数退避算法）
 - Forking 并发调用，返回成功的
 - Broadcast 逐个调用，任意一台报错则报错
 - 其它略
