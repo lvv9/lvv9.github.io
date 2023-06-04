@@ -81,7 +81,8 @@ HashMap底层（第一层）是Node<K,V>[]
 HashMap核心的方法：
 ```text
     public V put(K key, V value) {
-        return putVal(hash(key), key, value, false, true); // 内部的扰动函数使得碰撞的可能性更低，见 https://www.zhihu.com/question/20733617/answer/111577937
+        // 内部的扰动函数使得（2幂）碰撞的可能性更低，见 https://www.zhihu.com/question/20733617/answer/111577937
+        return putVal(hash(key), key, value, false, true);
     }
     final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                    boolean evict) {
@@ -731,7 +732,7 @@ synchronized是Java语言提供的特性，Java语言只规定了synchronized语
 |可重入|支持|支持
 |condition|一个|多个
 
-#### 常见基于AQS的工具
+#### 常见基于AQS的同步工具
 - ReentrantLock
 - ReentrantReadWriteLock
 - Semaphore（互斥锁是一个特殊的信号量，二元信号量）
@@ -762,7 +763,7 @@ JVM实现可以自由地决定不在规范中描述的细节，如运行时的�
 即运行时会用到的数据的区域，其中一些区域与虚拟机进程的生命周期绑定，另外一些与线程的绑定。
 - pc寄存器 其值可以用三元表达式表达（运行方法是native? undefined: 字节码指令地址），与线程绑定
 - Java虚拟机栈（线程）
-- Java堆（进程） 需要垃圾回收
+- Java堆（进程） 需要垃圾回收，与数据结构中的（大/小）堆没有关系
 - 方法区（进程） 内含运行时常量池（对象类型的只包含引用，对象数据在堆中），可以不进行垃圾回收<br>
   运行时常量池通过类或接口的class字节码常量池构造
 - 本地方法栈
@@ -829,6 +830,7 @@ JVM实现可以自由地决定不在规范中描述的细节，如运行时的�
 - 大量的OSGi
 
 运行时还可以通过HotSpot参数NativeMemoryTracking（生产一般不用）来先排查是哪部分区域有问题。
+
 部分参数可以通过jinfo运行时修改。
 
 ### GC
@@ -1044,7 +1046,7 @@ OSI分了七层：
 - 注册中心
 - 配置中心
 - 分布式事务 https://liuweiqiang.me/2022/12/28/consistency.html
-- 监控跟踪（Spring Cloud有Sleuth+Zipkin，或者SkyWalking）
+- 监控跟踪（Spring Cloud有Sleuth+Zipkin，或者SkyWalking，也有OpenTelemetry这样的） 利用span树实现调用栈的跟踪。
 
 ### Distributed lock
 如果Redis客户端是Redisson，建议直接用封装好的。
@@ -1061,7 +1063,7 @@ else
 end
 ```
 
-Redis官方介绍了高可靠的算法：Redlock
+Redis官方介绍了高可靠的算法：Redlock（高可用）
 
 ### Rate limiting
 由于通常的分布式锁并无fencing token这样的对资源保护，这样的分布式锁只能用来降低对资源的竞争而不能避免。
