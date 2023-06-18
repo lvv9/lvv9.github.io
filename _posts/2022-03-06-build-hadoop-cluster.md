@@ -214,7 +214,7 @@ public class JobDemo {
         job.setReducerClass(DemoReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
-        job.setNumReduceTasks(2); //控制reducer数量
+        job.setNumReduceTasks(2); // 控制reducer数量
         FileInputFormat.addInputPath(job, new Path("/demo/demoInput/"));
         FileOutputFormat.setOutputPath(job, new Path("/demo/demoOutput/"));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
