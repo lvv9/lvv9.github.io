@@ -17,8 +17,10 @@ PEM格式的文件可以使用openssl来转成各种格式，而且我们同样�
 ## 原理及验证
 
 ![SSL/TLS握手](https://github.com/lvv9/lvv9.github.io/blob/master/pic/image_2021-12-24_00-19-09.png?raw=true)
+
 在上图的TLS握手中可以看到，协议第一个安全方面的验证，就是证书的验证，具体算法可见 [数字签名算法](https://zh.wikipedia.org/wiki/%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D%E7%AE%97%E6%B3%95) [DSA](https://en.wikipedia.org/wiki/Digital_signature) <br>
 基于安全上等方面上的考虑，签发证书，是从CA分级签发的
+
 ![信任链](https://github.com/lvv9/lvv9.github.io/blob/master/pic/image_2021-12-28_01-41-22.png?raw=true)
 > The server sends the client a certificate or a certificate chain. A certificate chain typically begins with the server's public key certificate and ends with the certificate authority's root certificate.
 
