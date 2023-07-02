@@ -477,9 +477,14 @@ Tips：notify是"不可靠的"，被notify的对象可能会错过notify信号�
 
 中文版可以参考程晓明的《深入理解Java内存模型》。
 
-从Java应用程序员的角度看的话，最重要的是Happens-before规则：
+从Java应用程序员的角度看的话，最重要之一的是Happens-before Order规则：
 If one action happens-before another, then the first is visible to and ordered before the second.
 > It should be noted that the presence of a happens-before relationship between two actions does not necessarily imply that they have to take place in that order in an implementation. If the reordering produces results consistent with a legal execution, it is not illegal.
+
+对volatile变量来说就是"引用"的读写原子性（非CAS）。
+
+还有一个则是Synchronization Order，对于volatile来说即所谓的"可见性"：
+> A write to a volatile variable v synchronizes-with all subsequent reads of v by any thread (where "subsequent" is defined according to the synchronization order).
 
 #### 懒汉单例
 ```java
