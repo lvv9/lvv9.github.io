@@ -443,6 +443,7 @@ Thread state for a thread which has not yet started.
                 System.out.println("x");
                 try {
                     EventListener.class.wait();
+                    // 良好的习惯是wake up后在循环中检查执行条件
                 } catch (InterruptedException e) { // 获取锁后才会catch
                     e.printStackTrace();
                 }
