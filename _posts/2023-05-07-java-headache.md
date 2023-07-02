@@ -1120,7 +1120,7 @@ HASH索引只出现在MEMORY和NDB存储引擎。
 
 ##### 聚簇索引
 又称为主索引，指记录的顺序与这个索引的顺序相同。
-在MySQL中，主键是聚簇的，同时也是B+树，这样子的话搜索到相应的主键值后，可以得到记录的全部内容。
+在MySQL（InnoDB）中，主键是聚簇的，同时也是B+树，这样子的话搜索到相应的主键值后，可以得到记录的全部内容。
 而对于非聚簇索引，在搜索到相应的键值后，得到的value是主键值，需要"回表"。
 > 1. When you define a PRIMARY KEY on a table, InnoDB uses it as the clustered index. A primary key should be defined for each table. If there is no logical unique and non-null column or set of columns to use a the primary key, add an auto-increment column. Auto-increment column values are unique and are added automatically as new rows are inserted.
 > 2. If you do not define a PRIMARY KEY for a table, InnoDB uses the first UNIQUE index with all key columns defined as NOT NULL as the clustered index.
