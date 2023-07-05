@@ -1455,6 +1455,16 @@ PS：netty和jetty没有关系，jetty是servlet容器，对标tomcat，netty利
 |还包括了负载均衡、监控等|需要其它组件配合
 |倾向于自定义协议，更容易获得高性能|HTTP
 
+#### SPI
+简单来说就是调用方发布接口。
+
+##### Java SPI
+Java的SPI主要类是java.util.ServiceLoader，主要是读取jar中META-INF/services/下的元数据实现注册。
+java.sql.Driver使用了Java SPI。
+
+##### Dubbo（Java SDK） SPI
+Dubbo SPI与Java SPI类似，使用META-INF/dubbo/下的元数据。
+
 ### Spring
 
 #### IoC
