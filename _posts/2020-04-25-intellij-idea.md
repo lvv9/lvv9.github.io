@@ -1,8 +1,8 @@
 # IntelliJ IDEA
 
 ## Plugin
-SequenceDiagram 方便看时序图。<br>
-Maven Helper 查看Maven工程依赖情况。
+Maven Helper 查看Maven工程依赖情况。<br>
+TestMe 单元测试生成。
 
 ## Project & Module
 一个项目可以分为多个模块，相关设置存储在.idea目录和.iml文件中。比如用资源的Mark/Unmark操作。
