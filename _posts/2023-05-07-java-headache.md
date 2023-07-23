@@ -1036,7 +1036,7 @@ OSI分了七层：
 |其它浏览器行为|-|-
 
 #### HTTPS
-见 https://liuweiqiang.me/2021/12/23/implements-ssl-client.html
+见 https://liuweiqiang.me/2021/12/23/when-implements-ssl-client.html
 
 ### Root DNS
 根IP是Hard coded在操作系统中的。
