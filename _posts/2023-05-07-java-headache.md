@@ -931,7 +931,7 @@ jvms（Java虚拟机规范）规定了两种类加载器：
 
 应用问题排查要求对应用日志打印得较全。个人经验是打印方法所有的输入，如入参、DAO的返回等。
 
-有时会漏打，通过JVM的一些API（Java Agent、Attach API）可以实现一些运行时增强，如BTrace、Arthas。
+有时会漏打，通过JVM的一些API（Java Agent、Attach API）可以实现一些运行时增强，如BTrace、Arthas retransform。
 
 #### jstack查看线程状态
 在遇到Java应用死锁、阻塞时常用。
