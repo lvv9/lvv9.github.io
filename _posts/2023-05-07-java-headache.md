@@ -1206,6 +1206,8 @@ The server uses the controlling parameters in the following order to determine w
 
 这里的long_query_time是指实际的执行时间（=总耗时-锁阻塞时间）。
 
+除了慢查询日志，还有监控系统可以实现可观测（OpenTelemetry）。
+
 ##### Explain
 查看执行计划。
 有许多方式能改进语句的性能，如修改某些MySQL变量等。但作为开发人员经常使用的是优化DML语句和表结构。
@@ -1221,6 +1223,10 @@ The server uses the controlling parameters in the following order to determine w
 - 读写分离，使用主从复制分离读请求和写请求，也存在一些现实问题见DDIA（个人想法：读写分离不如CQRS）
 - 分库分表，水平分叫sharding，shard后涉及到分流（路由）、再平衡、事务的问题
   按服务分库较为常见；水平分库在数据库层（如TDSQL）用过，上层透明。
+  数据库sharding比较经典的方式：
+  - 范围
+  - 哈希
+- 一些复杂的计算，可以考虑用Spark、Flink、ElasticSearch等
 
 MySQL还提供了一些方法来影响执行计划，如：
 - STRAIGHT_JOIN控制连接的顺序
