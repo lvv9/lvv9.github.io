@@ -1273,6 +1273,11 @@ MySQL还提供了一些方法来影响执行计划，如：
 |速度|快|较快｜较慢
 |触发器|不触发|不触发|触发
 
+#### 大数据更新
+应考虑的问题（最好与DBA沟通）：
+- 避免锁表
+- 考虑分片
+
 ### Redis
 
 #### 数据类型
@@ -1342,7 +1347,7 @@ All the specially encoded types are automatically converted to the general type 
   However the instance may be turned to RDB persistence before shutting down it, than can be restarted, and finally AOF can be enabled again.
   ```
 - 哨兵 并发依旧不高，容量依旧不大，机器利用率低
-- 集群 至少3主3从
+- 集群 3主3从
 
 #### 集群
 ```text
@@ -1519,7 +1524,10 @@ RocketMQ所有主题所有分区使用相同的commit log文件，而Kafka不同
 - 其它略
 
 #### RPC协议
-默认的RPC协议为Dubbo，使用netty服务端和hessian2序列化。
+默认的RPC协议为Dubbo，使用netty服务端和hessian2序列化（二进制）。 https://cn.dubbo.apache.org/zh-cn/overview/mannual/java-sdk/reference-manual/protocol/dubbo/
+```text
+Dubbo 缺省协议采用单一长连接和 NIO 异步通讯，适合于小数据量大并发的服务调用，以及服务消费者机器数远大于服务提供者机器数的情况。
+```
 
 其它协议还有gRPC、RMI等。
 
@@ -1540,6 +1548,15 @@ PS：netty和jetty没有关系，jetty是servlet容器，对标tomcat，netty利
 ##### Java SPI
 Java的SPI主要类是java.util.ServiceLoader，主要是读取jar中META-INF/services/下的元数据实现注册。
 java.sql.Driver使用了Java SPI。
+
+由于Java SPI这个方法
+```text
+    public static <S> ServiceLoader<S> load(Class<S> service) {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        return ServiceLoader.load(service, cl);
+    }
+```
+使用了contextClassLoader，可能会破快双亲委派。
 
 ##### Dubbo（Java SDK） SPI
 Dubbo SPI与Java SPI类似，使用META-INF/dubbo/下的元数据。
@@ -1627,6 +1644,15 @@ https://zookeeper.apache.org/doc/r3.8.1/zookeeperInternals.html
   如果Leader在其任内出现任期大于它的事务，且这个Leader任内zxid最大的那部分提议没有被任一参与投票的Follower COMMIT，说明已有新的Leader，那么这部分过期的提议会被放弃。
 
 ## 安全
+- 网络隔离
+- 安全培训
+- 开发规范
+- 白名单库依赖
+- 安全扫描
+- 安全测试
+- 安全组件
+- 数据掩码
+- 数据脱敏
 
 ## 软件工程
 
@@ -1645,7 +1671,7 @@ https://semver.org/lang/zh-CN/
 - 可运维性
 - 简单性
 - 可演化性
-  为了更好的演化，通常需要考虑前向和后向兼容性。
+  为了更好的演化，通常需要考虑前向（前进）和后向兼容性。
   特别是前向兼容性，它要求旧代码能够在运行新的数据集上。
 
 ### 项目超期
