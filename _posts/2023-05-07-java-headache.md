@@ -7,6 +7,9 @@
 
 在动态面向对象语言中，多态不必通过继承实现，详情可查询关于duck typing的讨论。
 
+### 局部变量类型推断
+Java从10开始支持局部变量类型推断。
+
 ## IO
 https://liuweiqiang.me/2022/03/31/java-io.html
 
@@ -20,7 +23,7 @@ ArrayList底层用Object[]实现，内部使用了两个空数组：
 源码中注释的说法是
 > We distinguish this from EMPTY_ELEMENTDATA to know how much to inflate when first element is added.
 
-翻开1.8的源码，只有无参构造器会赋值DEFAULTCAPACITY_EMPTY_ELEMENTDATA：
+翻开8的源码，只有无参构造器会赋值DEFAULTCAPACITY_EMPTY_ELEMENTDATA：
 ```text
     public ArrayList() {
         this.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
@@ -797,12 +800,15 @@ synchronized是Java语言提供的特性，Java语言只规定了synchronized语
 
 应用：
 - 在Spring异步任务中会需要配置线程池
-- Web，容器在请求层面做了多线程处理
+- Web容器在请求层面做了多线程处理
 
 ### ThreadLocal
 见 https://liuweiqiang.me/2020/09/08/qs&tree.html
 
 在请求的生命周期内进行context的访问时用到、Spring @Transactional也用来保存事务的上下文。
+
+### 虚拟线程
+https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html
 
 ## 设计模式
 
