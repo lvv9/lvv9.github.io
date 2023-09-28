@@ -870,7 +870,7 @@ JVM实现可以自由地决定不在规范中描述的细节，如运行时的�
 - -XX:MaxMetaspaceSize 元空间（方法区的HotSpot实现）大小，默认无上限
 - -MaxDirectMemorySize 直接内存，不属于运行时数据区，New IO中的DirectByteBuffer对象会用到，直接内存受此参数与本地内存的限制
 - -XX:+UseContainerSupport 容器支持
-  - -XX:MaxRAMPercentage 最大堆占用，资源不固定时常用（如k8s）
+  - -XX:MaxRAMPercentage 最大堆占用，资源不固定时常用（如k8s），让JVM在内存接近容器上限时自行OOM
   - -XX:MinRAMPercentage
   - -XX:InitialRAMPercentage
 
