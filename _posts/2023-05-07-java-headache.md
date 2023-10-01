@@ -770,7 +770,9 @@ waitStatus：
 
 修饰方法：方法修饰符ACC_SYNCHRONIZED
 
-最重要的是虚拟机中C++实现的ObjectMonitor对象，Monitor（管程、监视器）是一种高级同步原语，为了更容易编写正确的程序。
+最重要的是虚拟机中C++实现的ObjectMonitor对象，作为JVM管程实现同步的一部分。
+Monitor（管程、监视器）是一种高级同步原语（与信号量等价），为了更容易编写正确的程序。
+JDK Lock（AQS）也是一种管程的实现。
 
 #### synchronized vs. Lock
 从上面的内容可以知道，synchronized与Lock最根本的不同在于：
