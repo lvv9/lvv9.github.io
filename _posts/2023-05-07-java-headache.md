@@ -1226,6 +1226,7 @@ The server uses the controlling parameters in the following order to determine w
 
 ##### 数据库优化
 包括但不限于
+- 数据库配置调整，一般开发人员接触不到，且需要DBA评估
 - 根据需要创建索引，利用排好序的冗余信息来获得更好的查询速度
 - 避免索引失效，如避免左模糊、对谓词所含的列使用函数、谓词中的操作无法使用索引
 - 反范式，增加冗余

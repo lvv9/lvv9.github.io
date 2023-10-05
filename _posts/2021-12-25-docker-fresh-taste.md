@@ -3,6 +3,8 @@
 ## 安装
 桌面用户安装Docker Desktop即可
 
+PS：苹果ARM用户也可以使用x86镜像，因为底层是用QEMU来运行Linux的。
+
 ## 对象
 image 程序包<br>
 repository 包仓库<br>
