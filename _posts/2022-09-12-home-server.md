@@ -17,6 +17,9 @@
 > qm set [vmid] -scsi[n] [dev]<br>
 > vmid为虚拟机id、n为不重复的scsi设备编号、dev为设备文件如/dev/sdb
 2. 将二磁盘直通虚拟机，格式化新的硬盘，最新的Kubuntu支持NTFS，于是就用了NTFS
+   用KDE分区管理工具可挂载NTFS，参数（重启生效）：
+> uid=1000,gid=1000,dmask=022,fmask=133
+> 自带的kdenetwork-filesharing可设置samba分享
 3. 安装FreeFileSync进行同步，Kubuntu需要安装libgtk2.0-0，安装后日志会在/var/log/apt/history.log
 4. FreeFileSync建议定时同步，Kubuntu（KDE）可在Discover（snap）安装KCron，设置好后还需要再运行crontab -e在执行的命令前加
 > DISPLAY=:0<br>
