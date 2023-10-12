@@ -4,6 +4,7 @@
 桌面用户安装Docker Desktop即可
 
 PS：苹果ARM用户也可以使用x86镜像，因为底层是用QEMU来运行Linux的。
+PPS：关于容器的UID https://www.cnblogs.com/sparkdev/p/9614164.html
 
 ## 对象
 image 程序包<br>
