@@ -26,3 +26,12 @@
 > :0为在桌面终端运行的echo $DISPLAY<br>
 > 效果如<br>
 > 0 0 * * * DISPLAY=:0 /home/lwq/FreeFileSync/FreeFileSync /home/lwq/BatchRun.ffs_batch
+
+5. OneDrive备份 https://rclone.org/install/
+> sudo usermod -aG docker $(id -un)<br>
+> newgrp docker<br>
+> docker pull rclone/rclone:latest
+> mkdir -p ~/config/dir<br>
+> docker run --rm -it --volume ~/config/dir:/config/rclone --user $(id -u):$(id -g) rclone/rclone config<br>
+> mkdir -p ~/data/dir<br>
+> docker run -it --volume ~/config/dir:/config/rclone --volume ~/data/dir:/data --user $(id -u):$(id -g) rclone/rclone copy lwq: /data --log-level INFO
