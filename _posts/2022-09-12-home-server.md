@@ -35,3 +35,6 @@
 > docker run --rm -it --volume ~/config/dir:/config/rclone --user $(id -u):$(id -g) rclone/rclone config<br>
 > mkdir -p ~/data/dir<br>
 > docker run -it --volume ~/config/dir:/config/rclone --volume ~/data/dir:/data --user $(id -u):$(id -g) rclone/rclone copy lwq: /data --log-level INFO
+
+同样可以加到cron中执行
+> docker container start [rclone]
