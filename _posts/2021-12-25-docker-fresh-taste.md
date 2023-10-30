@@ -78,6 +78,8 @@ CMD\ENTRYPOINT 有三种情况：
 > The main purpose of a CMD is to provide defaults for an executing container. These defaults can include an executable, or they can omit the executable, in which case you must specify an ENTRYPOINT instruction as well.
 > If the user specifies arguments to docker run then they will override the default specified in CMD.
 
+推荐第二种，前两种直接运行而无shell进程
+
 RUN 构建过程中执行的命令
 > The RUN instruction will execute any commands in a new layer on top of the current image and commit the results. The resulting committed image will be used for the next step in the Dockerfile.
 > Layering RUN instructions and generating commits conforms to the core concepts of Docker where commits are cheap and containers can be created from any point in an image's history, much like source control.
