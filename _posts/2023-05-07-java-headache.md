@@ -866,7 +866,7 @@ JVM实现可以自由地决定不在规范中描述的细节，如运行时的�
 ```
 
 #### HotSpot内存参数
-- -Xss Java虚拟机栈大小
+- -Xss Java虚拟机栈大小（单个线程）
 - -Xms、-Xmx Java堆最小最大大小
   - -Xmn 新生代大小，即将-XX:NewSize与-XX:MaxNewSize设为一致
 - -XX:MaxMetaspaceSize 元空间（方法区的HotSpot实现）大小，默认无上限
@@ -876,7 +876,7 @@ JVM实现可以自由地决定不在规范中描述的细节，如运行时的�
   - -XX:MinRAMPercentage
   - -XX:InitialRAMPercentage
 
-可以通过jstat -gccapacity来查看各区大小（单位为k）。
+可以通过jstat -gccapacity <id>来查看各区大小（单位为k）。
 
 PS：这里设置的各区大小并不是启动时跟操作系统申请的大小。
 
@@ -1165,7 +1165,7 @@ Redis官方介绍了高可靠的算法：Redlock（高可用）
 https://liuweiqiang.me/2019/01/28/database-note.html & https://liuweiqiang.me/2022/12/28/consistency.html
 
 #### Intention Locks
-意向锁用来高效地实现表锁与行锁的冲突检测，申请行级锁时需要先申请表级意向锁。它们的相容性：
+意向锁用来高效地实现表锁（包括显式的和隐式的）与行锁的冲突检测，申请行锁时需要先申请意向锁。它们的相容性：
 
 |-|（表级）X|IX|（表级）S|IS
 |:---:|:---:|:---:|:---:|:---:
