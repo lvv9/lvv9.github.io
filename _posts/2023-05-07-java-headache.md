@@ -529,11 +529,6 @@ Tips：notify是"不可靠的"，被notify的对象可能会错过notify信号�
 If one action happens-before another, then the first is visible to and ordered before the second.
 > It should be noted that the presence of a happens-before relationship between two actions does not necessarily imply that they have to take place in that order in an implementation. If the reordering produces results consistent with a legal execution, it is not illegal.
 
-对volatile变量来说就是"引用"的读写原子性（非CAS）。
-
-还有一个则是Synchronization Order，对于volatile来说即所谓的"可见性"：
-> A write to a volatile variable v synchronizes-with all subsequent reads of v by any thread (where "subsequent" is defined according to the synchronization order).
-
 #### 懒汉单例
 ```java
 public class Singleton {
@@ -803,6 +798,7 @@ synchronized是Java语言提供的特性，Java语言只规定了synchronized语
 应用：
 - 在Spring异步任务中会需要配置线程池
 - Web容器在请求层面做了多线程处理
+- 在批处理的IO操作中也常使用
 
 ### ThreadLocal
 见 https://liuweiqiang.me/2020/09/08/qs&tree.html
@@ -1569,7 +1565,7 @@ java.sql.Driver使用了Java SPI。
         return ServiceLoader.load(service, cl);
     }
 ```
-使用了contextClassLoader，可能会破快双亲委派。
+使用了contextClassLoader，可能会破坏双亲委派。
 
 ##### Dubbo（Java SDK） SPI
 Dubbo SPI与Java SPI类似，使用META-INF/dubbo/下的元数据。
