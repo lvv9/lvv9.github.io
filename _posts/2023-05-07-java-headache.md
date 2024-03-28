@@ -525,10 +525,13 @@ Tips：notify是"不可靠的"，被notify的对象可能会错过notify信号�
 
 中文版可以参考程晓明的《深入理解Java内存模型》。
 
-从Java应用程序员的角度看的话，最重要之一的是Happens-before Order规则：
+从Java应用程序员的角度看的话，最重要之一的是Happens-before Order规则（可见性）：
 If one action happens-before another, then the first is visible to and ordered before the second.
 > It should be noted that the presence of a happens-before relationship between two actions does not necessarily imply that they have to take place in that order in an implementation. If the reordering produces results consistent with a legal execution, it is not illegal.
 
+除了Happens-before Order，Java语言规范还定义了Synchronization Order（可见性及原子性）。
+Synchronization Order包含于Happens-before Order：
+> If an action x synchronizes-with a following action y, then we also have hb(x, y).
 #### 懒汉单例
 ```java
 public class Singleton {
