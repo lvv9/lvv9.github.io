@@ -38,3 +38,43 @@
 
 同样可以加到cron中执行
 > docker container start [rclone]
+
+6. 网络
+
+以下修改需要重启生效，或安装ifupdown2才能在页面上apply。
+
+修改ip地址:/etc/network/interfaces
+
+为了实现部分虚拟机隔离到DMZ，需要用到VLAN，同时配合OpenWrt实现。
+
+OpenWrt VLAN配置：
+
+![VLAN](https://github.com/lvv9/lvv9.github.io/blob/master/pic/vlan.png?raw=true)
+
+PVE网络接口：
+```text
+auto lo
+iface lo inet loopback
+
+iface eno1 inet manual
+
+iface eno1.1 inet manual
+
+auto vmbr1
+iface vmbr1 inet static
+address 10.10.10.2
+netmask 255.255.255.0
+gateway 10.10.10.1
+bridge_ports eno1.1
+bridge_stp off
+bridge_fd 0
+
+auto vmbr0
+iface vmbr0 inet manual
+bridge_ports eno1
+bridge_stp off
+bridge_fd 0
+```
+或许是打开方式不对，新增eno2无法直接使用。
+
+DMZ虚拟机使用vmbr0 tag=3。
