@@ -39,17 +39,19 @@
 同样可以加到cron中执行
 > docker container start [rclone]
 
-6. 网络
+## 网络
 
-以下修改需要重启生效，或安装ifupdown2才能在页面上apply。
-
-修改ip地址:/etc/network/interfaces
+### VLAN
 
 为了实现部分虚拟机隔离到DMZ，需要用到VLAN，同时配合OpenWrt实现。
 
 OpenWrt VLAN配置：
 
 ![VLAN](https://github.com/lvv9/lvv9.github.io/blob/master/pic/vlan.png?raw=true)
+
+以下PVE修改需要重启生效，或安装ifupdown2才能在页面上apply。
+
+修改IP地址:/etc/network/interfaces
 
 PVE网络接口：
 ```text
@@ -75,6 +77,93 @@ bridge_ports eno1
 bridge_stp off
 bridge_fd 0
 ```
-或许是打开方式不对，新增eno2无法直接使用。
+或许是打开方式不对，新增eno2无法直接配置静态的IP使用。
 
-DMZ虚拟机使用vmbr0 tag=3。
+DMZ虚拟机的网络配置中使用vmbr0 tag=3。
+
+### IP
+按照前面方式划分了两个网络，使用传统的IPv4 NAT配置起来比较简单：
+1. 新增类似于lan的接口，关联eth0.3设备
+2. 网络设置为不同于lan的网络如192.168.2.1/24
+3. 加入到lan区的netfilter规则
+
+但IPv6就复杂多了，互联网上对这个的讨论都比较粗浅，而且网络环境各不相同。
+
+本文目前所处环境（可预先生效wan、wan6获得）：
+分配了IPv6前缀（IPv6-PD），但分配的前缀是64位的，也就是说只能分配在一个子网。
+
+以下是研究实践过后的配置文件/etc/config/network：
+```text
+config globals 'globals'
+	option ula_prefix 'fd99:ca91:0a5d::/48'
+
+config interface 'wan'
+	option device 'eth0.2'
+	option proto 'pppoe'
+	option username 'xxx'
+	option password 'yyy'
+	option ipv6 '1'
+	option delegate '0'
+
+config interface 'wan6'
+	option proto 'dhcpv6'
+	option device '@wan'
+	option reqaddress 'try'
+	option reqprefix 'auto'
+	option delegate '0'
+
+config interface 'lan'
+	option device 'br-lan'
+	option proto 'static'
+	option ipaddr '192.168.1.1'
+	option netmask '255.255.255.0'
+	option ip6assign '64'
+	option delegate '0'
+	option ip6hint '0001'
+
+config interface 'dmz'
+	option device 'eth0.3'
+	option proto 'static'
+	option ipaddr '192.168.2.1'
+	option netmask '255.255.255.0'
+	option ip6assign '64'
+	option delegate '0'
+	option ip6hint '0002'
+```
+- ULA类似于IPv4的局域网地址，由于ISP分配的的GUA前缀是64位的，因此这里无法将ip6assign、ip6hint用于配置不同网络的GUA，因而需要使用dhcp配置（/etc/config/dhcp）的relay中继模式，跨路由器传递IP相关的管理信息
+- wan接口ipv6选项配置为auto时会自动生成一个接口，'1'时使用自定义的（wan6即@wan）。
+```text
+config dhcp 'wan'
+	option interface 'wan'
+	option ignore '1'
+
+config dhcp 'wan6'
+	option interface 'wan6'
+	option ignore '1'
+	option master '1'
+	option ra 'relay'
+	option dhcpv6 'relay'
+	option ndp 'relay'
+
+config dhcp 'lan'
+	option interface 'lan'
+	option start '100'
+	option limit '150'
+	option leasetime '12h'
+	option dhcpv4 'server'
+	option dhcpv6 'relay'
+	option ra 'relay'
+	option netmask '255.255.255.0'
+	option ndp 'relay'
+
+config dhcp 'dmz'
+	option interface 'dmz'
+	option start '100'
+	option limit '150'
+	option leasetime '12h'
+	option ra 'relay'
+	option dhcpv6 'relay'
+	option ndp 'relay'
+```
+配置生效后lan接口得到fd99:ca91:a5d:1::1/64地址，
+与lan接口连接的设备得到与路由器wan接口类似的GUA。
