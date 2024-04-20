@@ -110,7 +110,6 @@ config interface 'wan6'
 	option device '@wan'
 	option reqaddress 'try'
 	option reqprefix 'auto'
-	option delegate '0'
 
 config interface 'lan'
 	option device 'br-lan'
@@ -119,18 +118,19 @@ config interface 'lan'
 	option netmask '255.255.255.0'
 	option ip6assign '64'
 	option delegate '0'
-	option ip6hint '0001'
+	option ip6hint '0100'
 
 config interface 'dmz'
 	option device 'eth0.3'
 	option proto 'static'
 	option ipaddr '192.168.2.1'
 	option netmask '255.255.255.0'
-	option ip6assign '64'
+	option ip6assign '60'
 	option delegate '0'
-	option ip6hint '0002'
+	option ip6hint '0200'
+	list ip6class 'local'
 ```
-- ULA类似于IPv4的局域网地址，由于ISP分配的的GUA前缀是64位的，因此这里无法将ip6assign、ip6hint用于配置不同网络的GUA，因而需要使用dhcp配置（/etc/config/dhcp）的relay中继模式，跨路由器传递IP相关的管理信息
+- ULA类似于IPv4的局域网地址，由于ISP分配的的GUA前缀是64位的，因此这里无法将ip6assign、ip6hint用于配置不同网络的GUA，因而这里使用dhcp配置（/etc/config/dhcp）的server、relay中继模式分别对两个不同的接口分配IP，中继模式跨路由器传递IP相关的管理信息
 - wan接口ipv6选项配置为auto时会自动生成一个接口，'1'时使用自定义的（wan6即@wan）。
 ```text
 config dhcp 'wan'
@@ -151,10 +151,11 @@ config dhcp 'lan'
 	option limit '150'
 	option leasetime '12h'
 	option dhcpv4 'server'
-	option dhcpv6 'relay'
-	option ra 'relay'
+	option dhcpv6 'server'
+	option ra 'server'
 	option netmask '255.255.255.0'
-	option ndp 'relay'
+	list ra_flags 'managed-config'
+	list ra_flags 'other-config'
 
 config dhcp 'dmz'
 	option interface 'dmz'
@@ -165,5 +166,7 @@ config dhcp 'dmz'
 	option dhcpv6 'relay'
 	option ndp 'relay'
 ```
-配置生效后lan接口得到fd99:ca91:a5d:1::1/64地址，
-与lan接口连接的设备得到与路由器wan接口类似的GUA。
+配置生效后lan接口得到一个ULA地址fd99:ca91:a5d:100::1/64、一个从前缀计算出来的GUA，
+与lan接口连接的设备得到一个ULA，n个GUA。
+dmz接口得到ULA地址fd99:ca91:a5d:200::1/60，
+与dmz接口连接的设备得到与路由器wan接口类似的GUA。
