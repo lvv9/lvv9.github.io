@@ -82,17 +82,17 @@ bridge_fd 0
 DMZ虚拟机的网络配置中使用vmbr0 tag=3。
 
 ### IP
-按照前面方式划分了两个网络，使用传统的IPv4 NAT配置起来比较简单：
+按照前面方式划分了两个网络，只使用传统的IPv4 NAT配置起来比较简单：
 1. 新增类似于lan的接口，关联eth0.3设备
 2. 网络设置为不同于lan的网络如192.168.2.1/24
-3. 加入到lan区的netfilter规则
+3. 加入到lan区的netfilter规则（临时加入，建议建一个新的，见下）
 
 但IPv6就复杂多了，互联网上对这个的讨论都比较粗浅，而且网络环境各不相同。
 
-本文目前所处环境（可预先生效wan、wan6获得）：
+本文目前所处环境（可提前生效wan、wan6配置试得环境）：
 分配了IPv6前缀（IPv6-PD），但分配的前缀是64位的，也就是说只能分配在一个子网。
 
-以下是研究实践过后的配置文件/etc/config/network：
+配置/etc/config/network：
 ```text
 config globals 'globals'
 	option ula_prefix 'fd99:ca91:0a5d::/48'
@@ -110,6 +110,7 @@ config interface 'wan6'
 	option device '@wan'
 	option reqaddress 'try'
 	option reqprefix 'auto'
+	option delegate '1'
 
 config interface 'lan'
 	option device 'br-lan'
@@ -118,20 +119,20 @@ config interface 'lan'
 	option netmask '255.255.255.0'
 	option ip6assign '64'
 	option delegate '0'
-	option ip6hint '0100'
 
 config interface 'dmz'
 	option device 'eth0.3'
 	option proto 'static'
 	option ipaddr '192.168.2.1'
 	option netmask '255.255.255.0'
-	option ip6assign '60'
+	option ip6assign '64'
+	option ip6weight '1'
 	option delegate '0'
-	option ip6hint '0200'
-	list ip6class 'local'
 ```
-- ULA类似于IPv4的局域网地址，由于ISP分配的的GUA前缀是64位的，因此这里无法将ip6assign、ip6hint用于配置不同网络的GUA，因而这里使用dhcp配置（/etc/config/dhcp）的server、relay中继模式分别对两个不同的接口分配IP，中继模式跨路由器传递IP相关的管理信息
-- wan接口ipv6选项配置为auto时会自动生成一个接口，'1'时使用自定义的（wan6即@wan）。
+- ULA类似于IPv4的局域网地址
+- wan接口ipv6选项配置为auto时会自动生成一个接口，'1'时使用自定义的（wan6即@wan）
+- 由于ISP分配的的GUA前缀是64位的，因此这里无法配置不同网络的GUA，因而这里使用dhcp配置（/etc/config/dhcp）的server（SLAAC only）、relay中继模式分别对两个不同的接口分配IP，中继模式跨路由器传递IP相关的管理信息。
+  但是relay后始终不能把分配的IP加到路由，就把ip6weight选项加上让前缀在dmz接口分配
 ```text
 config dhcp 'wan'
 	option interface 'wan'
@@ -151,22 +152,32 @@ config dhcp 'lan'
 	option limit '150'
 	option leasetime '12h'
 	option dhcpv4 'server'
-	option dhcpv6 'server'
-	option ra 'server'
+	option dhcpv6 'relay'
+	option ra 'relay'
 	option netmask '255.255.255.0'
-	list ra_flags 'managed-config'
-	list ra_flags 'other-config'
+	option ndp 'relay'
 
 config dhcp 'dmz'
 	option interface 'dmz'
 	option start '100'
 	option limit '150'
 	option leasetime '12h'
-	option ra 'relay'
-	option dhcpv6 'relay'
-	option ndp 'relay'
+	option ra 'server'
+	option dhcpv6 'disabled'
+	option ndp 'server'
+	list ra_flags 'none'
 ```
-配置生效后lan接口得到一个ULA地址fd99:ca91:a5d:100::1/64、一个从前缀计算出来的GUA，
-与lan接口连接的设备得到一个ULA，n个GUA。
-dmz接口得到ULA地址fd99:ca91:a5d:200::1/60，
-与dmz接口连接的设备得到与路由器wan接口类似的GUA。
+配置生效后dmz接口得到一个ULA地址、一个从前缀计算出来的GUA，
+与dmz接口连接的设备得到ULA、GUA。
+lan接口得到一个ULA。
+
+### netfilter
+为了深入了解防火墙，特地找本教材学习了一下，ISBN：9787302278863。
+
+### DDNS
+这里选用dynv6.com的DDNS服务：洁面简洁、支持子域、API丰富（支持AAAA记录）、免费。
+> crontab -e 定时执行以下命令更新<br>
+> curl "https://ipv6.dynv6.com/api/update?ipv6=auto&token=..."
+
+### WireGuard
+https://wiki.debian.org/WireGuard
