@@ -133,6 +133,7 @@ config interface 'dmz'
 - wan接口ipv6选项配置为auto时会自动生成一个接口，'1'时使用自定义的（wan6即@wan）
 - 由于ISP分配的的GUA前缀是64位的，因此这里无法配置不同网络的GUA，因而这里使用dhcp配置（/etc/config/dhcp）的server（SLAAC only）、relay中继模式分别对两个不同的接口分配IP，中继模式跨路由器传递IP相关的管理信息。
   但是relay后始终不能把分配的IP加到路由（https://github.com/openwrt/openwrt/issues/11599），就把ip6weight选项加上让前缀在dmz接口分配
+- 后面无意中发现无线客户端接入上游可以正常relay
 ```text
 config dhcp 'wan'
 	option interface 'wan'
