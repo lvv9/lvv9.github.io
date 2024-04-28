@@ -182,3 +182,7 @@ lan接口得到一个ULA。
 
 ### WireGuard
 https://wiki.debian.org/WireGuard
+
+### MC801A
+MC801A是中兴的一款5G CPE，在存在下级路由的情况下需要手动设置APN来设置桥模式：
+https://community.three.co.uk/t5/Broadband/ZTE-MC801A-B12-update-Bridge-mode-broken/td-p/5860/highlight/true/page/3
