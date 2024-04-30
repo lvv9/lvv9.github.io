@@ -165,7 +165,7 @@ config dhcp 'dmz'
 	option leasetime '12h'
 	option ra 'server'
 	option dhcpv6 'disabled'
-	option ndp 'server'
+	option ndp 'disabled'
 	list ra_flags 'none'
 ```
 配置生效后dmz接口得到一个ULA地址、一个从前缀计算出来的GUA，
