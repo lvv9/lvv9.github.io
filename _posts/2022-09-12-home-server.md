@@ -37,7 +37,9 @@
 > docker run -it --volume ~/config/dir:/config/rclone --volume ~/data/dir:/data --user $(id -u):$(id -g) rclone/rclone copy lwq: /data --log-level INFO
 
 同样可以加到cron中执行
-> docker container start [rclone]
+> docker container start [rclone container id]
+
+iCloud用户可以用icloudpd https://github.com/boredazfcuk/docker-icloudpd
 
 ## 网络
 
