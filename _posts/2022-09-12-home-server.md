@@ -15,7 +15,7 @@
 ## 重建过程注意事项
 1. PVE硬盘直通：
 > qm set [vmid] -scsi[n] [dev]<br>
-> vmid为虚拟机id、n为不重复的scsi设备编号、dev为设备文件如/dev/sdb
+> vmid为虚拟机id、n为该虚拟机不重复的scsi设备编号、dev为设备文件如/dev/disk/by-id/xxx
 2. 将二磁盘直通虚拟机，格式化新的硬盘，最新的Kubuntu支持NTFS，于是就用了NTFS
    用KDE分区管理工具可挂载NTFS，参数（重启生效）：
 > uid=1000,gid=1000,dmask=022,fmask=133
@@ -42,6 +42,8 @@
 iCloud用户可以用icloudpd https://github.com/boredazfcuk/docker-icloudpd
 
 ## 网络
+
+以下仅供参考，本人已转RouterOS。
 
 ### VLAN
 
