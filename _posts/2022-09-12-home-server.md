@@ -181,7 +181,7 @@ lan接口得到一个ULA。
 为了深入了解防火墙，特地找本教材学习了一下，ISBN：9787302278863。
 
 ### DDNS
-这里选用dynv6.com的DDNS服务：洁面简洁、支持子域、API丰富（支持AAAA记录）、免费。
+这里选用dynv6.com的DDNS服务：界面简洁、支持子域、API丰富（支持AAAA记录）、免费。
 > crontab -e 定时执行以下命令更新<br>
 > curl "https://ipv6.dynv6.com/api/update?ipv6=auto&token=..."
 
