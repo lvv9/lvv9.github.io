@@ -18,19 +18,26 @@
 1. PVE硬盘直通：
 > qm set [vmid] -scsi[n] [dev]<br>
 > vmid为虚拟机id、n为该虚拟机不重复的scsi设备编号、dev为设备文件如/dev/disk/by-id/xxx
-2. 将二磁盘直通虚拟机，格式化新的硬盘，最新的Kubuntu支持NTFS，于是就用了NTFS
-   用KDE分区管理工具可挂载NTFS，参数（重启生效）：
-> uid=1000,gid=1000,dmask=022,fmask=133
-> 自带的kdenetwork-filesharing可设置samba分享
-3. 安装FreeFileSync进行同步，~~Kubuntu需要安装libgtk2.0-0，~~ apt安装日志会在/var/log/apt/history.log(或zless /var/log/apt/history.log.1.gz)。
-   如果samba未安装，在dolphin点击后也可以在日志看到利用packagekit安装samba的信息。
-4. FreeFileSync建议定时同步，Kubuntu（KDE）可在Discover（snap）安装KCron，设置好后还需要再运行crontab -e在执行的命令前加
+2. 将二磁盘直通虚拟机，格式化新的硬盘，最新的Kubuntu支持NTFS，于是就用了NTFS。
+   ~~用KDE分区管理工具可挂载NTFS，~~ fstab参数（重启生效）：
+> UUID=XXXX /MOUNT/POINT ntfs3 uid=1000,gid=1000,dmask=022,fmask=133 0 0 #（ntfs3为官方ntfs驱动，最后一个pass选项设为0避免因掉盘造成系统无法启动）
+3. ~~自带的kdenetwork-filesharing可设置samba分享。如果samba未安装，在dolphin点击后也可以在apt安装日志看到利用packagekit安装samba的信息。~~
+   配置/etc/samba/smb.conf
+```text
+[sync]
+   path = /MOUNT/POINT
+   browsable = yes
+   guest ok = no
+   read only = yes
+```
+4. 安装FreeFileSync进行同步（或者用成品NAS同步），~~Kubuntu需要安装libgtk2.0-0，~~ apt安装日志会在/var/log/apt/history.log(或zless /var/log/apt/history.log.1.gz)。
+5. FreeFileSync建议定时同步，Kubuntu（KDE）可在Discover（snap）安装KCron，设置好后还需要再运行crontab -e在执行的命令前加
 > DISPLAY=:0<br>
 > :0为在桌面终端运行的echo $DISPLAY<br>
 > 效果如<br>
 > 0 0 * * * DISPLAY=:0 /home/lwq/FreeFileSync/FreeFileSync /home/lwq/BatchRun.ffs_batch
 
-5. OneDrive备份 https://rclone.org/install/
+6. OneDrive备份 https://rclone.org/install/
 > sudo usermod -aG docker $(id -un)<br>
 > newgrp docker<br>
 > docker pull rclone/rclone:latest
