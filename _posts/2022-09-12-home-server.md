@@ -29,6 +29,13 @@
    browsable = yes
    guest ok = no
    read only = yes
+[path]
+   path = /MOUNT/POINT
+   browsable = yes
+   guest ok = no
+   write list = username
+   create mask = 0644
+   directory mask = 0755
 ```
 4. 安装FreeFileSync进行同步（或者用成品NAS同步），~~Kubuntu需要安装libgtk2.0-0，~~ apt安装日志会在/var/log/apt/history.log(或zless /var/log/apt/history.log.1.gz)。
 5. FreeFileSync建议定时同步，Kubuntu（KDE）可在Discover（snap）安装KCron，设置好后还需要再运行crontab -e在执行的命令前加
@@ -192,7 +199,7 @@ lan接口得到一个ULA。
 ### DDNS
 这里选用dynv6.com的DDNS服务：界面简洁、支持子域、API丰富（支持AAAA记录）、免费。
 > crontab -e 定时执行以下命令更新<br>
-> curl "https://ipv6.dynv6.com/api/update?ipv6=auto&token=..."
+> curl "https://ipv6.dynv6.com/api/update?ipv6=auto&token=...&zone=..."
 
 ### WireGuard
 https://wiki.debian.org/WireGuard
@@ -200,3 +207,22 @@ https://wiki.debian.org/WireGuard
 ### MC801A
 MC801A是中兴的一款5G CPE，在存在下级路由的情况下需要手动设置APN来设置桥模式，除了名称其它参数保持与自动一样：
 https://community.three.co.uk/t5/Broadband/ZTE-MC801A-B12-update-Bridge-mode-broken/td-p/5860/highlight/true/page/3
+
+## Hyper-V
+更新：
+自MicroServer Gen8入手以来已经过去了接近10年，硬件也变得有些过时。在最近的检测中发现待机功率接近50W，于是进行了全面的升级。
+鉴于MicroServer或者类似的服务器价格上也“升级”了许多，且当下桌面级机器也普遍过剩，于是选用了某个NUC——带两个2280 M.2接口、一个2.5 SATA。
+在新机器试用Hyper-V，以下是一些注意事项。
+
+### 安装
+为了快速地安装Win，可能需要跳过网络连接、OneDrive登录等。
+跳过网络连接可能导致安装完成后没有网卡驱动，可以先准备好网卡驱动。
+
+### 电源
+由于Headless桌面PC不像之前的服务器那样，可以进行方便的Web管理，而用远程桌面进行操作，但是Win 11的电源策略会导致睡眠后无法连接，可以把睡眠时间改成永不。
+
+### 更新
+防止服务被更新中断，设置了更新策略为通知下载，通过组策略编辑器修改。
+
+### 硬盘直通
+Hyper-V也支持硬盘直通，这次将硬盘格式化为了exFAT。
