@@ -22,6 +22,7 @@ DisplayLink扩展坞基本上就是一个USB 3.0显卡，是一种便宜又不�
 Sunshine编码并通过网络发送数据，Moonlight接收网络数据并解码，Virtual Display Driver虚拟多一块显示器，让Moonlight画出虚拟的屏幕，软件实现DisplayLink。
 由于本人的Steam机器是AMD APU+Nvidia 40系显卡并在UEFI设置了混合，使用最新发布的Sunshine会有Bug（ https://github.com/LizardByte/Sunshine/pull/3002 ）。
 可以用预发布的版本。
+安装虚拟显示需要信任证书，安装完后可以删除。
 
 ## 切换器
 当显示输出数量大于显示设备时使用，如果已经有无线投屏器的话，就不太需要了。
