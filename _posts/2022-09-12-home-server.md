@@ -210,13 +210,20 @@ https://community.three.co.uk/t5/Broadband/ZTE-MC801A-B12-update-Bridge-mode-bro
 
 ## Hyper-V
 更新：
-自MicroServer Gen8入手以来已经过去了接近10年，硬件也变得有些过时。在最近的检测中发现待机功率接近50W，于是进行了全面的升级。
+自MicroServer Gen8入手以来已经过去了接近10年，它的硬件配置变得有些过时。在最近的检测中发现待机功率接近50W，于是进行了全面的升级。
 鉴于MicroServer或者类似的服务器价格上也“升级”了许多，且当下桌面级机器也普遍过剩，于是选用了某个NUC——带两个2280 M.2接口、一个2.5 SATA。
 在新机器试用Hyper-V，以下是一些注意事项。
 
 ### 安装
 为了快速地安装Win，可能需要跳过网络连接、OneDrive登录等。
-跳过网络连接可能导致安装完成后没有网卡驱动，可以先准备好网卡驱动。
+跳过网络连接可能导致安装完成后没有网卡驱动，可以先准备好网卡驱动，Shift F10输入OOBE\BYPASSNRO跳过网络步骤。
+
+#### 双系统
+本人在不同的硬盘安装双系统，在多个不同的系统试用过程中将共享的EFI分区删除了，导致Hyper-V服务器无法启动。
+解决方法是在Hyper-V所在的盘创建单独的EFI分区，并通过BCDBoot复制UEFI必需的启动环境文件复制到EFI分区：
+> bcdboot Z:\Windows /s O: /f UEFI
+
+Z为在修复工具环境中自行分配的系统分区盘符，O为分配的新EFI分区盘符。
 
 ### 电源
 由于Headless桌面PC不像之前的服务器那样，可以进行方便的Web管理，而用远程桌面进行操作，但是Win 11的电源策略会导致睡眠后无法连接，可以把睡眠时间改成永不。
@@ -225,4 +232,4 @@ https://community.three.co.uk/t5/Broadband/ZTE-MC801A-B12-update-Bridge-mode-bro
 防止服务被更新中断，设置了更新策略为通知下载，通过组策略编辑器修改。
 
 ### 硬盘直通
-Hyper-V也支持硬盘直通，这次将硬盘格式化为了exFAT。
+Hyper-V也支持硬盘直通，这次将硬盘格式化为了exFAT。注意在【设备加密设置】中设置BitLocker。
