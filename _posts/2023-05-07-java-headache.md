@@ -1233,8 +1233,8 @@ The server uses the controlling parameters in the following order to determine w
 - 减少数据量，如覆盖索引、只select必要的列、分页等
 - 减少网络IO，如在程序循环外一次性读取而不是循环中读取、batchInsert代替循环insert
 - 读写分离，使用主从复制分离读请求和写请求，也存在一些现实问题见DDIA（个人想法：读写分离不如CQRS）
-- 分库分表，水平分叫sharding，shard后涉及到分流（路由）、再平衡、事务的问题
-  按服务分库较为常见；水平分库在数据库层（如TDSQL）用过，上层透明。
+- 分库分表分区，水平分叫sharding，shard后涉及到分流（路由）、再平衡、事务的问题
+  按服务垂直分库较为常见；水平分库分表在数据库层（如TDSQL）用过，上层透明（Proxy）；银行项目实践中有按分行分区、分表的。
   数据库sharding比较经典的方式：
   - 范围
   - 哈希
