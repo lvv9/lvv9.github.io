@@ -997,7 +997,7 @@ jvms（Java虚拟机规范）规定了两种类加载器：
 #### 重放+Debug
 在开发阶段最常用手段，线上一般不允许使用。
 
-如果远程服务支持，可以远程Debug（或者Arthas watch）。
+如果远程服务支持，可以远程Debug（-agentlib:jdwp=transport=dt_socket,address=5005,server=y,suspend=y suspend=y启动时将suspend）（或者Arthas watch）。
 
 #### 日志分析异常
 包括应用日志、中间件日志，测试阶段常用，线上可能会屏蔽低级别日志。
