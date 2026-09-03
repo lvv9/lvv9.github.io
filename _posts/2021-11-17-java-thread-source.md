@@ -385,7 +385,7 @@ new Thread(() -> System.out.println("hello world")).start();
 ```
 Worker的这个设计，应该是种模式，ThreadLocal中也有。<br>
 我们知道，在开始的简单的创建启动线程的例子中，Runnable作为Thread构造器的参数，在Thread构造时将其与Runnable绑定起来。<br>
-但是在线程池的需求中，Runnable任务是随着我们的需求添加的，而Thread线程需要稳定在core这么多个，因而这里通过Thread与Worker绑定、Worker的run()解藕实际的任务Runnable并进行dispatch实现。<br>
+但是在线程池的需求中，Runnable任务是随着我们的需求添加的，而Thread线程需要稳定在core这么多个，因而这里通过Thread与Worker绑定、Worker的run()解耦实际的任务Runnable并进行dispatch实现。<br>
 在runWorker()中，调用了任务队列中任务的run，并最终调用processWorkerExit()：
 ```text
     /**
