@@ -1,7 +1,7 @@
 # 领域驱动设计与Hibernate
 
 ## 1 为什么DDD
-Evans书副标题——Tracking complexity in the heart of software
+Evans书副标题——Tackling complexity in the heart of software
 
 ### DDD的优势
 - 增加开发人员与领域专家的交流，促进开发人员与业务人员的相互提升，使软件能更好地表达业务
