@@ -557,7 +557,7 @@ public class Singleton {
     }
 }
 ```
-单例的饿汉式写法因为一个bug变得非常经典。
+单例的懒汉式写法因为一个bug变得非常经典。
 第一个对 instance == null 的判断是为了避免对Singleton.class锁的无效竞争。
 但是因为第一个判断不是同步的，所以多个线程可能"同时"得到true的结果。
 而Singleton.class锁保护了第二个 instance == null 的判断，同时volatile修饰instance变量是必要的：
