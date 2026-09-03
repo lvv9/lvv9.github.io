@@ -1623,7 +1623,7 @@ org.springframework.beans.factory.BeanCurrentlyInCreationException: Error creati
 
 #### AOP
 - @Aspect 切面类
-- @Before、@After、@AfterRunning、@AfterThrowing、@Around 五种通知
+- @Before、@After、@AfterReturning、@AfterThrowing、@Around 五种通知
 - @PointCut、通知的pointcut参数 切入点
 
 ### ZooKeeper
