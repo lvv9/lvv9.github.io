@@ -15,14 +15,22 @@ Java从10开始支持局部变量类型推断。
 
 局部变量不能在lambda表达式（或内部类）中被修改：
 ```
+void m7(int x) {
+    foo(() -> x=1);
+    // Illegal: x is not effectively final.
+}
+```
+这是因为lambda表达式体不一定会被马上执行：
+> Lambda expression evaluation does not cause the execution of the expression's body; instead, this may occur at a later time when an appropriate method of the functional interface is invoked.
+
+同时，被lambda引用的局部变量，也必须是effectively final的：
+```
 void m6(int x) {
     foo(() -> x+1);
     x++;
     // Illegal: x is not effectively final.
 }
 ```
-这是因为lambda表达式体不一定会被马上执行：
-> Lambda expression evaluation does not cause the execution of the expression's body; instead, this may occur at a later time when an appropriate method of the functional interface is invoked.
 
 ## IO
 https://liuweiqiang.me/2022/03/31/java-io.html
